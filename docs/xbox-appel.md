@@ -182,6 +182,12 @@ Verified progress:
   checkpoint two with fourteen apples retained. Later deaths returned to
   checkpoint three with all nineteen apples retained on the later attempts.
 - Back/Select opened runtime pause and B resumed repeatedly.
+- The ground route beneath the later platforms and a jump over its enemy
+  reached the final structure. Down+Right crouched through its low opening;
+  jumping into the bonus alcove and moving left collected both apples,
+  reaching **21/35**. Crouching back through the opening also worked. The
+  subsequent backtrack died beside the spiked wall; checkpoint three restored
+  the player with all twenty-one apples retained. This was not a finish.
 - Direct TV listening confirmed clean music without crackles or dropouts in
   this normal-build session. The KVM recordings still contain transport gaps.
 
@@ -202,7 +208,16 @@ checkpoint-three recovery with nineteen apples. Each full directory name
 uses the `appel-normal98-` prefix and retains original JPEGs, timestamps,
 hashes and executed controller/observer sources.
 
-The later platform gaps and low-ceiling route remain unfinished. Failed jumps
+The ground route, enemy clearance, crouch passage, bonus apples and return are
+recorded in `appel-normal98-ground-advance85`, `ground-route86`,
+`ground-enemy87`, `crouch-opening88`, `crouch-through89`, `notch-step90`,
+`notch-apple91` and `notch-return92`. The failed backtrack is `backtrack93`.
+Checkpoint recovery is `recover21-94`. These names also use the
+`appel-normal98-` prefix. The local
+`appel-normal98-crouch-bonus-verification.json` records the evidence inventory
+and JPEG hash checks; image review establishes the gameplay results.
+
+The later platform gaps and route to the finish remain unfinished. Failed jumps
 and falls are retained. **Normal-build Level 1 completion and victory replay
 remain open**, along with longer audio continuity verification. The direct TV
 listening result is saved in `appel-normal98-tv-listening-confirmation.json`;
