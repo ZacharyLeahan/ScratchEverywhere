@@ -1,8 +1,8 @@
-# Twenty-game hardware qualification
+# Xbox game hardware qualification
 
 The goal is twenty playable games, with actual Xbox testing and fixes until each
 works. Downloads, successful builds, and a title screen are not full passes.
-Twenty distinct projects are now packaged and installed with archive readback
+Twenty-one distinct game projects are now packaged and installed with archive readback
 verification. Installation is not qualification; outstanding gameplay checks
 remain listed below. The current console has 128MB RAM; this does not
 establish retail 64MB support.
@@ -16,6 +16,7 @@ neutralize all reports afterwards.
 
 | Game | Evidence so far | Still needed |
 | --- | --- | --- |
+| [Zach's Spider Adventure](xbox-spider-adventure.md) | Installed as game 21 with unchanged project/assets and controller sidecar; full FTP readback; normal browser launch, D-pad/A gameplay reaches Level 6 / Score 7,516 / Best combo 6 and Game Over; Y replay, stick controls, Back/Select pause, clean browser return and confirmed second launch; 15-second non-clipping HDMI audio signal | Full ten-level victory; subjective and long-run audio |
 | [Hopper Heros Everywhere](xbox-hopper.md) | Normal-build browser launch; added missing D-pad/arrow profile without archive changes; D-pad/stick Left/Right and A jump; post-profile losses at 3 and 8 points, Start replay to zero, B to authored menu, browser returns and fresh-launch gameplay/movement; 8s non-clipping HDMI audio | One early short Start missed after relaunch; sustained progression and subjective/long-run audio; shared KVM handoff |
 | [Ultra Bird](xbox-ultra-bird.md) | Current normal-build browser selection; A flap, loss, Score 2 and another Score 1; short Start restarts a scored stopped round to zero with new moving pipes and another A flap; browser return and fresh launch with two more A flaps; long Start opens pause; original archive has no sound assets or sound/music blocks; installed normal pen-color build reaches Score 6 through camera-only controller play, with live sixth-pipe clearance and seventh approach; natural loss and short-Start replay to zero/new pipes; fresh normal-browser launch/A flap, two clean exits, eight seconds of digital silence and complete unchanged-archive/XBE readback | Shared KVM delivery |
 | [Catch Apples](xbox-catch-apples.md) | Fixed missing D-pad profile; synchronized build D-pad/stick steering, directed collection to Score 22/Timer 0, short Start replay to 0/30, pause/exit, fresh launch and second exit; 8s non-clipping HDMI audio | Intermittent exit launches 2048; isolated bonus/rotten-apple scoring; subjective/long-run audio |
