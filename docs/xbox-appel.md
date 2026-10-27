@@ -269,3 +269,26 @@ The candidate preserves Appel's project, authored update rate, physics and
 audio. The physical Xbox remains on the previous normal build while the user
 plays. **Hardware frame-time comparison and subjective movement confirmation
 remain pending; this candidate is not yet a proven smoothness fix.**
+
+### Candidate gameplay regression in xemu
+
+The normal candidate (`ac3142d7…`, profiling OFF) passed a further private-guest
+check with the installed prepared project JSON and nonaudio assets. Diagnostic
+keys went through the native input and key-hat functions; no project variables,
+positions, maps or scores were written. Space press/release entered the level
+through its prepared menus. Right entered normal play, movement and jumping
+worked, and releasing jump returned the player to the ground with zero vertical
+velocity. The first apple registered.
+
+Holding Right against the first raised ledge kept the player at the same wall
+position across both observations. Right+Space then cleared it, collected the
+second apple and landed on top with zero vertical velocity. Original framebuffer
+images and read-only state snapshots support these results; the input vector was
+restored before detaching and the private guest was closed.
+
+This covers 108 diagnostic input polls through the menus and 186 in the movement
+sequence. Debugger input changes pacing: these counts are **not FPS or physical
+controller evidence**. Audio was omitted only in the guest fixture; this adds no
+audio, full-level-completion or hardware-smoothness result. Local evidence is
+`build-xbox/appel-movement-smoothness/emulator-gameplay-verification.json` and
+its referenced original images, snapshots and executed input-probe source.
