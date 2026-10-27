@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <hal/debug.h>
+#include <hal/xbox.h>
 #include <hal/video.h>
 #include <log.hpp>
 #include <lwip/debug.h>
@@ -58,6 +59,13 @@ bool initNetworking() {
 #endif
     Log::log("Network initialized successfully.");
     return true;
+}
+
+static OS::SystemAction systemAction = OS::SystemAction::None;
+
+void OS::requestSystemAction(SystemAction action) {
+    systemAction = action;
+    toExit = true;
 }
 
 bool OS::init() {
@@ -134,7 +142,14 @@ void OS::deinit() {
     Log::closeNetworkTrace();
 #endif
     nxNetShutdown();
-    return;
+    if (systemAction == SystemAction::None) return;
+    fflush(NULL);
+    if (systemAction == SystemAction::Launcher) XLaunchXBE("E:\\Dashboard\\default.xbe");
+    if (systemAction == SystemAction::Shutdown) {
+        if (NT_SUCCESS(HalWriteSMBusValue(0x20, 0x02, FALSE, 0x80)))
+            for (;;) Sleep(1000);
+    }
+    XReboot();
 }
 
 std::string OS::getPlatform() {

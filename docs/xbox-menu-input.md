@@ -114,3 +114,25 @@ a continuous client A hold, with no logged active-controller switch. Player Four
 records main-KVM routing send errors during the hold. This explains the menu's
 new-confirmation edge in those occurrences; the precise transport fault and
 direct physical-pad behavior remain unverified.
+
+## Console pause and system actions
+
+- Tap **Start** in a game to pause. Tap Start again, or B, to resume.
+- Choose **Return to game list** in pause to leave the current Scratch project.
+- Choose **Exit / System** in pause, or press **B / Y** from the game list,
+  for Cancel, Return to launcher, Restart Xbox, and Shut down Xbox.
+- System actions have a second confirmation with Cancel selected initially.
+  Launcher return uses `E:\Dashboard\default.xbe`, matching the Slime Volley
+  and Neverball ports. A missing launcher leaves the app running.
+- Hold **LT + RT + Back + Start** together for **two seconds** to reboot the
+  Xbox from gameplay or menus. Release any button to cancel the countdown.
+  This physical shortcut ignores project mappings and deliberately uses a
+  direct firmware reboot; it does not save or wait for normal app cleanup.
+- Start is reserved for pause on Xbox and no longer emits a Scratch game key.
+  Pause also works for bundled projects.
+
+Hardware validation: tap Start during gameplay, resume with Start/B, leave for
+and launch another game, cancel each system confirmation, check missing-launcher
+handling, then verify launcher return, reboot, and power-off separately. Check
+that partial/brief reset chords do nothing and a two-second chord reboots in
+both gameplay and the game list. Firmware actions require a real Xbox test.

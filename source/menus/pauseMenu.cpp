@@ -6,6 +6,9 @@
 #include <utility>
 #include <xbox_menu_trace.hpp>
 #include <algorithm>
+#ifdef __XBOX__
+#include <filesystem.hpp>
+#endif
 #ifdef SE_XBOX_TRACE_GAME_STATE
 #include <blockExecutor.hpp>
 #include <log.hpp>
@@ -84,6 +87,14 @@ void PauseMenu::init() {
     stopButton->buttonDown = turboButton;
     turboButton->buttonUp = stopButton;
 
+#ifdef __XBOX__
+    systemButton = new ButtonObject("Exit / System", "gfx/menu/projectBox.svg", 200, 180, "gfx/menu/Ubuntu-Bold", true);
+    systemButton->text->setColor(Math::color(0, 0, 0, 255));
+    pauseControl->buttonObjects.push_back(systemButton);
+    turboButton->buttonDown = systemButton;
+    systemButton->buttonUp = turboButton;
+    exitProjectButton->text->setText("Return to game list");
+#endif
     isInitialized = true;
 }
 
@@ -111,11 +122,14 @@ void PauseMenu::requestAction(Action action) {
 void PauseMenu::render() {
     Input::getInput();
 #ifdef __XBOX__
+    const bool startHeld = std::find(Input::inputButtons.begin(), Input::inputButtons.end(), "start") != Input::inputButtons.end();
+    if (!startHeld) startReleased = true;
+    if (pendingAction == Action::None && startReleased && startHeld) requestAction(Action::Resume);
     if (pendingAction != Action::None) {
         const auto held = [](const char *key) {
             return std::find(Input::inputKeys.begin(), Input::inputKeys.end(), key) != Input::inputKeys.end();
         };
-        if (!held("a") && !held("x") && !held("b") && !held("y") && !Input::mousePointer.isPressed) {
+        if (!startHeld && !held("a") && !held("x") && !held("b") && !held("y") && !Input::mousePointer.isPressed) {
             finishAction(pendingAction);
             return;
         }
@@ -123,6 +137,12 @@ void PauseMenu::render() {
 #endif
     {
         pauseControl->input();
+#ifdef __XBOX__
+        if (systemButton->isPressed()) {
+            showXboxSystemMenu();
+            return;
+        }
+#endif
 
         if (backButton->isPressed({"b", "y"})) {
             requestAction(Action::Resume);
@@ -183,6 +203,10 @@ void PauseMenu::cleanup() {
         delete stopButton;
         stopButton = nullptr;
     }
+#ifdef __XBOX__
+    delete systemButton;
+    systemButton = nullptr;
+#endif
     if (pauseControl != nullptr) {
         delete pauseControl;
         pauseControl = nullptr;
@@ -192,3 +216,55 @@ void PauseMenu::cleanup() {
         turboButton = nullptr;
     }
 }
+
+#ifdef __XBOX__
+// Modal so the caller retains its selection and the paused runtime stays frozen.
+void showXboxSystemMenu() {
+    const auto held = [] { return !Input::inputButtons.empty() || Input::mousePointer.isPressed; };
+    const auto choose = [&](const std::vector<std::string> &labels) {
+        ControlObject control;
+        MenuText hint("Reset: LT + RT + Back + Start (hold 2s)", 200, 210);
+        std::vector<std::unique_ptr<ButtonObject>> buttons;
+        for (size_t i = 0; i < labels.size(); ++i) {
+            buttons.emplace_back(new ButtonObject(labels[i], "gfx/menu/projectBox.svg", 200, 60 + i * 30, "gfx/menu/Ubuntu-Bold", true));
+            buttons.back()->text->setColor(Math::color(0, 0, 0, 255));
+            control.buttonObjects.push_back(buttons.back().get());
+            if (i) {
+                buttons[i-1]->buttonDown = buttons[i].get();
+                buttons[i]->buttonUp = buttons[i-1].get();
+            }
+        }
+        control.selectedObject = buttons[0].get();
+        buttons[0]->isSelected = true;
+        bool armed = false;
+        int result = -1;
+        while (Render::appShouldRun()) {
+            Input::getInput();
+            if (!held()) armed = true;
+            if (result >= 0) {
+                if (!held()) return result;
+            } else if (armed) {
+                control.input();
+                if (Input::keyHeldDuration["b"] == 1 || Input::keyHeldDuration["y"] == 1) result = 0;
+                for (size_t i = 0; i < buttons.size(); ++i)
+                    if (buttons[i]->isPressed()) result = static_cast<int>(i);
+            }
+            Render::beginFrame(0, 108, 100, 128);
+            Render::beginFrame(1, 108, 100, 128);
+            control.render();
+            hint.render();
+            Render::endFrame(false);
+        }
+        return 0;
+    };
+    const std::vector<std::string> labels = {"Cancel", "Return to launcher", "Restart Xbox", "Shut down Xbox"};
+    int action = choose(labels);
+    if (!action) return;
+    if (action == 1 && !FileSystem::fileExists("E:\\Dashboard\\default.xbe")) {
+        choose({"Launcher not found - return"});
+        return;
+    }
+    if (choose({"Cancel", "Confirm: " + labels[action]}) != 1) return;
+    OS::requestSystemAction(static_cast<OS::SystemAction>(action));
+}
+#endif
