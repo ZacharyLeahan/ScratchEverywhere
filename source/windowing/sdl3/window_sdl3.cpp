@@ -284,7 +284,7 @@ void WindowSDL3::pollEvents() {
     } else if (!resetHeld) {
         resetHeld = true;
         resetHeldSince = SDL_GetTicks();
-    } else if (SDL_GetTicks() - resetHeldSince >= 750) {
+    } else if (SDL_GetTicks() - resetHeldSince >= 2000) {
         Log::log("Xbox reset combo: rebooting to the configured dashboard.");
         XReboot();
     }

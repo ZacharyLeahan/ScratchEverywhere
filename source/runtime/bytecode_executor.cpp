@@ -1,4 +1,5 @@
 #include "bytecode_executor.hpp"
+#include "xbox_frame_profile.hpp"
 #include "blockExecutor.hpp"
 #include "math.hpp"
 #include "renderer.hpp"
@@ -753,6 +754,54 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
                 SE_NEXT();
             }
 
+            SE_CASE(NumAdd) {
+                const double b = thread.numberStack.back();
+                thread.numberStack.pop_back();
+                thread.numberStack.back() = thread.numberStack.back() + b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(NumSubtract) {
+                const double b = thread.numberStack.back();
+                thread.numberStack.pop_back();
+                thread.numberStack.back() = thread.numberStack.back() - b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(NumMultiply) {
+                const double b = thread.numberStack.back();
+                thread.numberStack.pop_back();
+                thread.numberStack.back() = thread.numberStack.back() * b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(NumDivide) {
+                const double b = thread.numberStack.back();
+                thread.numberStack.pop_back();
+                thread.numberStack.back() = thread.numberStack.back() / b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(BooleanAnd) {
+                const bool b = thread.boolStack.back();
+                thread.boolStack.pop_back();
+                thread.boolStack.back() = thread.boolStack.back() && b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(BooleanOr) {
+                const bool b = thread.boolStack.back();
+                thread.boolStack.pop_back();
+                thread.boolStack.back() = thread.boolStack.back() || b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(BooleanNot) {
+                thread.boolStack.back() = !thread.boolStack.back();
+                thread.pc++;
+                SE_NEXT();
+            }
+
             SE_CASE(CallNative)
             SE_CASE_ALIAS(CallNativeNumber)
             SE_CASE_ALIAS(CallNativeString)
@@ -760,6 +809,9 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
             SE_CASE_ALIAS(CallNativeColor)
             SE_CASE_ALIAS(CallNativeValue) {
                 BytecodeIndex opSlot = instr.a;
+#ifdef SE_XBOX_PROFILE_THREADS
+                XboxFrameProfile::NativeScope profileNative(stringAt(thread, thread.chunk->opcodeSlots[opSlot]));
+#endif
                 BytecodeIndex start = thread.chunk->paramKindsStart[opSlot];
                 BytecodeIndex count = thread.chunk->paramKindsCount[opSlot];
                 const BytecodePositionalFn &fn = (thread.link && opSlot < thread.link->positional.size()) ? thread.link->positional[opSlot] : BytecodePositionalFn{};
@@ -1684,7 +1736,15 @@ void BytecodeExecutor::runThreads() {
             continue;
         }
 
-        if (!thread->escapedToLegacy) runThread(*thread);
+        if (!thread->escapedToLegacy) {
+#ifdef SE_XBOX_PROFILE_THREADS
+            Timer profileThread;
+#endif
+            runThread(*thread);
+#ifdef SE_XBOX_PROFILE_THREADS
+            XboxFrameProfile::thread(thread->sprite->name, profileThread.getTimeMsDouble(), false);
+#endif
+        }
 
         if (Scratch::shouldStop) return;
         i++;

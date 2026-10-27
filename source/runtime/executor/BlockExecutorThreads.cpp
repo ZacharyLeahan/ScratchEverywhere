@@ -1,4 +1,5 @@
 #include "blockExecutor.hpp"
+#include "xbox_frame_profile.hpp"
 #include "bytecode_executor.hpp"
 #include <algorithm>
 #include <cstddef>
@@ -35,18 +36,24 @@ uint64_t BlockExecutor::startHat(Sprite *sprite, Block *hat) {
 }
 
 std::vector<uint64_t> BlockExecutor::startBroadcastHats(std::string broadcast) {
+#ifdef SE_XBOX_PROFILE_THREADS
+    Timer profileBroadcast;
+#endif
     std::transform(broadcast.begin(), broadcast.end(), broadcast.begin(), ::tolower);
 
     std::vector<uint64_t> startedThreads;
     for (auto &spr : Scratch::sprites) {
-        if (spr->hats["event_whenbroadcastreceived"].empty()) continue;
-        for (Block *hat : spr->hats["event_whenbroadcastreceived"]) {
-            std::string broadcastOption = Scratch::getFieldValue(*hat, "BROADCAST_OPTION");
-            std::transform(broadcastOption.begin(), broadcastOption.end(), broadcastOption.begin(), ::tolower);
-
-            if (broadcastOption == broadcast) startedThreads.push_back(startHat(spr, hat));
-        }
+        Sprite *definition = spr->cloneOriginal ? spr->cloneOriginal : spr;
+        const auto hats = definition->hats.find("event_whenbroadcastreceived");
+        if (hats == definition->hats.end() || hats->second.empty()) continue;
+        const auto &matching = definition->broadcastHatIndex.lookup(broadcast, hats->second, [](Block *hat) {
+            return Scratch::getFieldValue(*hat, "BROADCAST_OPTION");
+        });
+        for (Block *hat : matching) startedThreads.push_back(startHat(spr, hat));
     }
+#ifdef SE_XBOX_PROFILE_THREADS
+    XboxFrameProfile::thread("dispatch:" + broadcast, profileBroadcast.getTimeMsDouble(), false);
+#endif
     return startedThreads;
 }
 
@@ -108,7 +115,13 @@ void BlockExecutor::runThreads() {
             continue;
         }
 
+#ifdef SE_XBOX_PROFILE_THREADS
+        Timer profileThread;
+#endif
         var = runThread(*thread, *thread->sprite);
+#ifdef SE_XBOX_PROFILE_THREADS
+        XboxFrameProfile::thread(thread->sprite->name, profileThread.getTimeMsDouble(), true);
+#endif
 
         if (Scratch::shouldStop) return;
         i++;

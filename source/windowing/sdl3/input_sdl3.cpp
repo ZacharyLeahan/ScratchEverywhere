@@ -159,7 +159,14 @@ void InputDevice_SDL3::getInput() {
 #endif
     }
     if (SDL_GetGamepadButton(controller, SDL_GamepadButton::SDL_GAMEPAD_BUTTON_START)) Input::buttonPress("start");
-    if (SDL_GetGamepadButton(controller, SDL_GamepadButton::SDL_GAMEPAD_BUTTON_BACK)) Input::buttonPress("back");
+    if (SDL_GetGamepadButton(controller, SDL_GamepadButton::SDL_GAMEPAD_BUTTON_BACK)) {
+#ifdef __XBOX__
+        // Reserve the physical menu button independently of game mappings.
+        Input::inputButtons.push_back("back");
+#else
+        Input::buttonPress("back");
+#endif
+    }
     if (SDL_GetGamepadButton(controller, SDL_GamepadButton::SDL_GAMEPAD_BUTTON_LEFT_STICK)) Input::buttonPress("LeftStickPressed");
     if (SDL_GetGamepadButton(controller, SDL_GamepadButton::SDL_GAMEPAD_BUTTON_RIGHT_STICK)) Input::buttonPress("RightStickPressed");
     float joyLeftX = SDL_GetGamepadAxis(controller, SDL_GamepadAxis::SDL_GAMEPAD_AXIS_LEFTX);
@@ -203,7 +210,7 @@ void InputDevice_SDL3::getInput() {
 
 #ifdef __XBOX__
     // Supply an accessible replay action after a game ends with "stop all".
-    // Browser projects retain the long-press pause menu while running.
+    // Back/Select opens pause; Start stays available for game/replay actions.
     static bool previousStart = false;
     const bool startPressed = std::find(Input::inputButtons.begin(), Input::inputButtons.end(), "start") != Input::inputButtons.end();
     if (startPressed && !previousStart && Scratch::stageSprite != nullptr &&

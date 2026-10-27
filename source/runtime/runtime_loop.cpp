@@ -6,6 +6,7 @@
 #include "translation.hpp"
 #include "unzip.hpp"
 #include "xbox_variable_watch.hpp"
+#include "xbox_frame_profile.hpp"
 #include <algorithm>
 #include <input.hpp>
 #include <iostream>
@@ -58,7 +59,14 @@ void Scratch::initializeScratchProject() {
 }
 
 std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayThread) {
-    if (!Render::appShouldRun()) {
+#ifdef SE_XBOX_PROFILE_FRAMES
+    Timer profilePoll;
+#endif
+    const bool appRunning = Render::appShouldRun();
+#ifdef SE_XBOX_PROFILE_FRAMES
+    XboxFrameProfile::poll(profilePoll.getTimeMsDouble());
+#endif
+    if (!appRunning) {
         // appShouldRun() only ever returns false when the platform wants the app
         // to quit (OS::toExit, or the window/ProcUI saying so) -- never because
         // the project merely ended. Mark it explicitly so mainLoop() goes straight
@@ -127,13 +135,26 @@ std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayTh
         extensions::runUpdateFunctions(extensions::PRE_UPDATE);
 #endif
 
+#ifdef SE_XBOX_PROFILE_FRAMES
+        Timer profilePhase;
+        double profileInput = 0;
+#endif
         if (checkFPS) {
             Input::getInput();
             BlockExecutor::executeWhenGreaterThanHats();
         }
+#ifdef SE_XBOX_PROFILE_FRAMES
+        profileInput = profilePhase.getTimeMsDouble();
+        profilePhase.start();
+#endif
         BlockExecutor::runThreads();
         BytecodeExecutor::runThreads();
         XboxVariableWatch::sample();
+#ifdef SE_XBOX_PROFILE_FRAMES
+        const double profileScripts = profilePhase.getTimeMsDouble();
+        XboxFrameProfile::work(profileInput, profileScripts);
+        profilePhase.start();
+#endif
 
 #ifdef ENABLE_INSPECTOR
         if (forcedStep && Inspector::stepsRemaining <= 0) std::cout << "STEP_DONE\n";
@@ -168,6 +189,9 @@ std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayTh
 
             Render::renderSprites();
             Scratch::flushCostumeImages();
+#ifdef SE_XBOX_PROFILE_FRAMES
+            XboxFrameProfile::sample(profilePhase.getTimeMsDouble());
+#endif
 
             if (debugVars) stageSprite->variables["SE!__FPS"].value = Value(std::to_string(std::clamp(static_cast<int>(currentFPS), 0, FPS)));
 
@@ -179,11 +203,11 @@ std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayTh
 
         const bool browserProject = projectType == ProjectType::UNEMBEDDED || (projectType == ProjectType::UNZIPPED && Unzip::UnpackedInSD);
 #ifdef __XBOX__
-        // Start is reserved for the console pause menu, including bundled games.
-        static bool startWasHeld = false;
-        const bool startHeld = std::find(Input::inputButtons.begin(), Input::inputButtons.end(), "start") != Input::inputButtons.end();
-        const bool pauseRequested = startHeld && !startWasHeld;
-        startWasHeld = startHeld;
+        // Back/Select opens the console menu; Start remains available to games.
+        static bool backWasHeld = false;
+        const bool backHeld = std::find(Input::inputButtons.begin(), Input::inputButtons.end(), "back") != Input::inputButtons.end();
+        const bool pauseRequested = backHeld && !backWasHeld;
+        backWasHeld = backHeld;
 #else
         const bool pauseRequested = browserProject && Input::keyHeldDuration["1"] > 90 * (FPS / 30.0f);
 #endif

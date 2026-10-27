@@ -192,7 +192,9 @@ add_compile_options(
 # Optimize the filesystem, components of the runtime, renderers, and windowing to run with -O3 optimizations.
 file(GLOB_RECURSE SE_MAX_OPTIMIZE_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/source/filesystem.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/blockExecutor.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/bytecode_executor.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/executor/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/blocks/*.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/math.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/time.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/value.cpp"
@@ -320,3 +322,22 @@ macro(package_platform)
     )
 endif()
 endmacro()
+
+option(SE_XBOX_PROFILE_FRAMES "Log aggregated frame timing every 120 rendered frames" OFF)
+if(SE_XBOX_PROFILE_FRAMES)
+    set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/runtime_loop.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/bytecode_executor.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/executor/BlockExecutorThreads.cpp"
+        APPEND PROPERTY COMPILE_DEFINITIONS SE_XBOX_PROFILE_FRAMES)
+endif()
+
+option(SE_XBOX_PROFILE_THREADS "Include detailed thread/native costs in frame profiles" OFF)
+if(SE_XBOX_PROFILE_THREADS)
+    if(NOT SE_XBOX_PROFILE_FRAMES)
+        message(FATAL_ERROR "Thread profiling requires SE_XBOX_PROFILE_FRAMES")
+    endif()
+    set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/runtime_loop.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/bytecode_executor.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/executor/BlockExecutorThreads.cpp"
+        APPEND PROPERTY COMPILE_DEFINITIONS SE_XBOX_PROFILE_THREADS)
+endif()

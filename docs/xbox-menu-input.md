@@ -117,7 +117,7 @@ direct physical-pad behavior remain unverified.
 
 ## Console pause and system actions
 
-- Tap **Start** in a game to pause. Tap Start again, or B, to resume.
+- Tap **Back / Select** in a game to pause. Tap Back / Select again, or B, to resume.
 - Choose **Return to game list** in pause to leave the current Scratch project.
 - Choose **Exit / System** in pause, or press **B / Y** from the game list,
   for Cancel, Return to launcher, Restart Xbox, and Shut down Xbox.
@@ -128,7 +128,7 @@ direct physical-pad behavior remain unverified.
   Xbox from gameplay or menus. Release any button to cancel the countdown.
   This physical shortcut ignores project mappings and deliberately uses a
   direct firmware reboot; it does not save or wait for normal app cleanup.
-- Start is reserved for pause on Xbox and no longer emits a Scratch game key.
+- Back / Select is reserved for pause on Xbox and no longer emits a Scratch game key. Start remains available for game controls and replay.
   Pause also works for bundled projects.
 
 Hardware validation: tap Start during gameplay, resume with Start/B, leave for
