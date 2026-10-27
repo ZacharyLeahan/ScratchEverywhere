@@ -176,11 +176,14 @@ Verified progress:
   player; subsequent jumps climbed the staircase back onto the roof.
 - Cleared the upper-ledge enemy with two short follow-up A presses, crossed the
   lower spikes and activated **checkpoint three at 16/35**. The next higher
-  platform and lower passage brought the count to **18/35**.
+  platform and lower passage brought the count to **18/35**. Further platform
+  jumps reached **19/35**, repeated on another attempt.
 - Enemy/spike collisions showed the breakup animation and returned to
   checkpoint two with fourteen apples retained. Later deaths returned to
-  checkpoint three with all eighteen apples retained.
+  checkpoint three with all nineteen apples retained on the later attempts.
 - Back/Select opened runtime pause and B resumed repeatedly.
+- Direct TV listening confirmed clean music without crackles or dropouts in
+  this normal-build session. The KVM recordings still contain transport gaps.
 
 The transparent player outline inside the green ledge is the game's hidden
 tunnel, not evidence of death or missing terrain. Holding jump there can keep
@@ -193,13 +196,17 @@ Local evidence is under ignored `build-xbox/hardware/`: the
 `appel-normal98-recovery21` / `checkpoint-final23`. The later enemy crossing,
 checkpoint and recovery recordings are `appel-normal98-upper-cross24`,
 `spike-drop25`, `checkpoint3-jump26`, `high-platform28`, `lower-advance30`
-and `cp3-death-recovery37`. Each full directory name
+and `cp3-death-recovery37`. Nineteen-apple landings are retained in
+`edge-gap56`, `raised-route65` and `edge-jump70`; `upper-recover72` shows
+checkpoint-three recovery with nineteen apples. Each full directory name
 uses the `appel-normal98-` prefix and retains original JPEGs, timestamps,
 hashes and executed controller/observer sources.
 
 The later platform gaps and low-ceiling route remain unfinished. Failed jumps
 and falls are retained. **Normal-build Level 1 completion and victory replay
-remain open**, as do audio acceptance checks. The earlier diagnostic Level 1
+remain open**, along with longer audio continuity verification. The direct TV
+listening result is saved in `appel-normal98-tv-listening-confirmation.json`;
+it applies to this Appel session. The earlier diagnostic Level 1
 win is a separate result. These recordings do not extend the frame-rate
 benchmark or establish retail 64MB support. See the [capture transport limits](xbox-audio-resampling.md#capture-transport-limits--october-27)
 before interpreting long network-audio recordings as playback continuity.
