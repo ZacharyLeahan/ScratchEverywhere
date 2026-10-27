@@ -117,6 +117,27 @@ direct physical-pad behavior remain unverified.
 
 ## Console pause and system actions
 
+### Shared mouse controls
+
+The Xbox pause menu always shows these instructions, regardless of the project:
+hold **White + D-pad / left stick** to move the pointer, and keep **White** held
+while pressing **RT** to click. Black is also accepted as the click button.
+These are mouse clicks, not separate left/right mouse buttons.
+
+The first use of pointer mode during gameplay shows the same instructions and
+a reminder about Back / Select pause for six seconds. The hint appears once per
+app session, draws above the game, and does not consume input or pause scripts.
+It does not depend on game-specific menu detection or idle timers.
+
+October 27 shared-help validation: Xbox Release build passed with profiling off;
+FTP readback verified `F:\scratch-pointer-help-20261027\default.xbe` with SHA-256
+`98c93665e87f51ce9b503c876b0301155e07084922bb1588dcd777bbbfca807e`.
+KVM checks confirmed both pause lines fit, the first pointer use shows the
+three-line hint, and later pointer use after expiry leaves it hidden. The game
+continued running under the hint. Appel's project archive was unchanged.
+
+### Pause and system actions
+
 - Tap **Back / Select** in a game to pause. Tap Back / Select again, or B, to resume.
 - Choose **Return to game list** in pause to leave the current Scratch project.
 - Choose **Exit / System** in pause, or press **B / Y** from the game list,
