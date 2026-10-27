@@ -122,14 +122,14 @@ void PauseMenu::requestAction(Action action) {
 void PauseMenu::render() {
     Input::getInput();
 #ifdef __XBOX__
-    const bool startHeld = std::find(Input::inputButtons.begin(), Input::inputButtons.end(), "start") != Input::inputButtons.end();
-    if (!startHeld) startReleased = true;
-    if (pendingAction == Action::None && startReleased && startHeld) requestAction(Action::Resume);
+    const bool backHeld = std::find(Input::inputButtons.begin(), Input::inputButtons.end(), "back") != Input::inputButtons.end();
+    if (!backHeld) backReleased = true;
+    if (pendingAction == Action::None && backReleased && backHeld) requestAction(Action::Resume);
     if (pendingAction != Action::None) {
         const auto held = [](const char *key) {
             return std::find(Input::inputKeys.begin(), Input::inputKeys.end(), key) != Input::inputKeys.end();
         };
-        if (!startHeld && !held("a") && !held("x") && !held("b") && !held("y") && !Input::mousePointer.isPressed) {
+        if (!backHeld && !held("a") && !held("x") && !held("b") && !held("y") && !Input::mousePointer.isPressed) {
             finishAction(pendingAction);
             return;
         }
@@ -223,7 +223,12 @@ void showXboxSystemMenu() {
     const auto held = [] { return !Input::inputButtons.empty() || Input::mousePointer.isPressed; };
     const auto choose = [&](const std::vector<std::string> &labels) {
         ControlObject control;
-        MenuText hint("Reset: LT + RT + Back + Start (hold 2s)", 200, 210);
+        MenuText hint("Reset Xbox: hold both triggers", 200, 190);
+        MenuText hintChord("+ Back + Start for 2 seconds", 200, 205);
+        for (MenuText *line : {&hint, &hintChord}) {
+            line->scale = 0.65;
+            line->text->setCenterAligned(true);
+        }
         std::vector<std::unique_ptr<ButtonObject>> buttons;
         for (size_t i = 0; i < labels.size(); ++i) {
             buttons.emplace_back(new ButtonObject(labels[i], "gfx/menu/projectBox.svg", 200, 60 + i * 30, "gfx/menu/Ubuntu-Bold", true));
@@ -253,6 +258,7 @@ void showXboxSystemMenu() {
             Render::beginFrame(1, 108, 100, 128);
             control.render();
             hint.render();
+            hintChord.render();
             Render::endFrame(false);
         }
         return 0;

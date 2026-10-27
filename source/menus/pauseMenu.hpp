@@ -18,7 +18,7 @@ class SE_EXPORT PauseMenu : public Menu {
     void finishAction(Action action);
 #ifdef __XBOX__
     std::map<std::string, std::string> gameControls;
-    bool startReleased = false;
+    bool backReleased = false;
 #endif
   public:
 #ifdef __XBOX__

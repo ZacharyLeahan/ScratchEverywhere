@@ -241,15 +241,14 @@ void InputDevice_SDL2::getInput() {
         resetHeld = true;
         if (Uint32(SDL_GetTicks() - resetSince) >= 2000) XReboot();
     } else resetHeld = false;
-    // Reserve Start: do not send it through project key mappings.
-    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_START))
-        Input::inputButtons.push_back("start");
-#else
-    button_handler(SCRATCH_KEY_INDEX::START, SDL_CONTROLLER_BUTTON_INVALID);
 #endif
-    // if (SDL_GameControllerGetButton(controller, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_START)) Input::buttonPress("start");
-    if (SDL_GameControllerGetButton(controller, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_BACK)) {
+    button_handler(SCRATCH_KEY_INDEX::START, SDL_CONTROLLER_BUTTON_INVALID);
+    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK)) {
+#ifdef __XBOX__
+        Input::inputButtons.push_back("back");
+#else
         Input::buttonPress(CONTROLLER_STRINGS[static_cast<int>(SCRATCH_KEY_INDEX::BACK)]);
+#endif
 #ifdef WII
         OS::toExit = true;
 #endif
