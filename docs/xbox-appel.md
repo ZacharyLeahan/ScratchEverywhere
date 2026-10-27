@@ -154,3 +154,46 @@ board and reached Score 12, and Back/Select opened the runtime pause menu.
 Return to game list worked. Appel then launched from that list; A opened its
 level picker and A selected Level 1 without pointer controls. The console was
 left in Appel with controller reports neutral and KVM input ownership released.
+
+## Normal-build route qualification — October 27
+
+Extended controller play on the physical 128MB Xbox used the later shared-help
+normal build, `F:\scratch-pointer-help-20261027\default.xbe`, SHA-256
+`98c93665e87f51ce9b503c876b0301155e07084922bb1588dcd777bbbfca807e`.
+Both profiling options are OFF. The prepared controller-menu archive is
+`69a2a2767d85620b09ccfa228e7ec62cc7896db10725bd23a03af0a41ceb16ad`;
+its gameplay scripts and assets are preserved. Existing full FTP readback
+receipts identify these artifacts; no new readback was possible during play.
+This run used HDMI images and Player Two controller reports, with no debugger,
+live game-variable reads or game-state writes.
+
+Verified progress:
+
+- Entered Level 1 through the controller menus and activated checkpoints one
+  and two. Repeated jumps landed on both moving blue platforms and the roof.
+- Entered the authored hidden passage, collected its apples and reached
+  **14/35**. Releasing jump, moving left and then jumping restored the visible
+  player; subsequent jumps climbed the staircase back onto the roof.
+- Enemy/spike collisions showed the breakup animation and returned to
+  checkpoint two. The final recovery retained all fourteen collected apples.
+- Back/Select opened runtime pause; B resumed. The console was left paused
+  after the final visible checkpoint recovery, with controller input released.
+
+The transparent player outline inside the green ledge is the game's hidden
+tunnel, not evidence of death or missing terrain. Holding jump there can keep
+the player against its ceiling; see the earlier [tunnel investigation](xbox-game-qualification.md#checkpoint-three-and-lower-route--october-26-evening).
+
+Local evidence is under ignored `build-xbox/hardware/`: the
+`appel-normal98-lift1-gated1`, `lift2-gated2` and `roof-gated1` recordings;
+`appel-normal98-tunnel-follow8`, `tunnel-exit8`, `tunnel-exit9`,
+`tunnel-escape10`, `stairs-climb12` and `roof-return13`; and
+`appel-normal98-recovery21` / `checkpoint-final23`. Each full directory name
+uses the `appel-normal98-` prefix and retains original JPEGs, timestamps,
+hashes and executed controller/observer sources.
+
+The upper ledge was reached briefly, but the follow-up enemy jump is not yet
+verified. Other attempts fell into the tunnel or hit spikes; they remain
+failures. **Normal-build Level 1 completion and victory replay remain open**,
+as do longer audio stability and subjective listening. The earlier diagnostic
+Level 1 win is a separate result. These recordings do not extend the frame-rate
+benchmark or establish retail 64MB support.
