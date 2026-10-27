@@ -225,3 +225,47 @@ it applies to this Appel session. The earlier diagnostic Level 1
 win is a separate result. These recordings do not extend the frame-rate
 benchmark or establish retail 64MB support. See the [capture transport limits](xbox-audio-resampling.md#capture-transport-limits--october-27)
 before interpreting long network-audio recordings as playback continuity.
+
+## Movement smoothness follow-up — candidate, October 27
+
+Direct TV feedback during normal play described movement/scrolling as less
+smooth, rather than the whole scene freezing. The earlier first-section result
+of about 30 rendered FPS does not establish fluid movement throughout the level.
+
+A new **shared-runtime candidate** removes two sources of repeated work:
+
+- List indexing checks string-only keywords through borrowed interned text.
+  Numeric terrain/collision indices no longer make a number → string → number
+  round trip. Reads, replacements, deletions and insertions retain the existing
+  conversions, bounds and random-index behavior.
+- Input/timer/broadcast hat lookups reuse their opcode strings. Missing hats
+  are looked up without inserting empty entries into every sprite/clone.
+  Matching listeners, their ordering, key-repeat and pause behavior are retained.
+
+The actual VM cases pass differential checks against the previous behavior,
+including empty/missing lists, fractional and nonfinite indices, keyword case,
+booleans/colors, random-call counts, stack state and the 200,000-item limit.
+Actual dispatch functions pass key-repeat/pause/timer/clone-listener checks.
+Both new checks use AddressSanitizer and UndefinedBehaviorSanitizer:
+
+```sh
+python3 tests/bytecode_list_index_test.py
+python3 tests/hat_dispatch_allocation_test.py
+```
+
+A host-only empty-scene test with 400 sprites and 100 input/timer/broadcast
+polls counted 80,100 allocations in the previous code and zero after warm-up in
+the candidate; absent hat maps also remain empty. A host-only numeric lookup
+microbenchmark removed 1,000,000 number-formatting calls per trial. These are
+work-count/microbenchmark results, **not Xbox FPS or whole-game speedups**.
+The numeric-cache, typed arithmetic and broadcast-index regression checks pass,
+and the normal NXDK Release build succeeds with profiling disabled. The candidate
+also boots Appel to its title screen in an isolated xemu guest, using the
+installed prepared project JSON and nonaudio assets. Audio assets were omitted
+only in that guest fixture because its BIOS exposes 64MB; this is a startup
+correctness check, not a hardware performance or audio result.
+
+The candidate preserves Appel's project, authored update rate, physics and
+audio. The physical Xbox remains on the previous normal build while the user
+plays. **Hardware frame-time comparison and subjective movement confirmation
+remain pending; this candidate is not yet a proven smoothness fix.**

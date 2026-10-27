@@ -8,6 +8,7 @@
 #include <cmath>
 #include <cstdint>
 #include <random>
+#include <string_view>
 #ifdef ENABLE_AUDIO
 #include <audiostack.hpp>
 #endif
@@ -153,9 +154,14 @@ const std::string &variableIdAt(BytecodeThread &thread, BytecodeIndex varSlot) {
 
 size_t resolveListIndex(const Value &indexValue, size_t size) {
     if (size == 0) return size;
-    std::string indexStr = indexValue.asString();
-    if (indexStr == "last") return size - 1;
-    if (indexStr == "random" || indexStr == "any") return static_cast<size_t>(fastRandomBelow(size));
+    // Terrain/collision loops commonly use numeric indices. Formatting each
+    // index as text just to check three string-only keywords wastes work on
+    // every tile probe. Borrow interned text only when it is actually a string.
+    if (indexValue.isString()) {
+        const std::string_view indexStr = indexValue.asStringView();
+        if (indexStr == "last") return size - 1;
+        if (indexStr == "random" || indexStr == "any") return static_cast<size_t>(fastRandomBelow(size));
+    }
 
     double d = indexValue.get<double>();
     if (!std::isfinite(d)) return size;
@@ -621,21 +627,11 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
                 List *list = listAt(thread, instr.a);
                 Value index = popValue(thread, BytecodeStackKind::Value);
                 if (list) {
-                    std::string indexStr = index.asString();
-                    if (indexStr == "all") {
+                    if (index.isString() && index.asStringView() == "all") {
                         list->items.clear();
-                    } else if (indexStr == "last" && !list->items.empty()) {
-                        list->items.pop_back();
-                    } else if ((indexStr == "random" || indexStr == "any") && !list->items.empty()) {
-                        list->items.erase(list->items.begin() + fastRandomBelow(list->items.size()));
                     } else {
-                        double d = index.get<double>();
-                        if (std::isfinite(d)) {
-                            double idx = std::floor(d) - 1;
-                            if (idx >= 0 && idx < static_cast<double>(list->items.size())) {
-                                list->items.erase(list->items.begin() + static_cast<size_t>(idx));
-                            }
-                        }
+                        const size_t pos = resolveListIndex(index, list->items.size());
+                        if (pos < list->items.size()) list->items.erase(list->items.begin() + pos);
                     }
                 }
                 thread.pc++;
@@ -652,23 +648,9 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
                 Value index = popValue(thread, BytecodeStackKind::Value);
                 Value item = popValue(thread, BytecodeStackKind::Value);
                 if (list) {
-                    std::string indexStr = index.asString();
-                    size_t pos;
-                    if (indexStr == "last") pos = list->items.size();
-                    else if (indexStr == "random" || indexStr == "any") pos = static_cast<size_t>(fastRandomBelow(list->items.size() + 1));
-                    else {
-                        double d = index.get<double>();
-                        if (!std::isfinite(d)) {
-                            thread.pc++;
-                            SE_NEXT();
-                        }
-                        double idx = std::floor(d) - 1;
-                        if (idx < 0 || idx > static_cast<double>(list->items.size())) {
-                            thread.pc++;
-                            SE_NEXT();
-                        }
-                        pos = static_cast<size_t>(idx);
-                    }
+                    // Insertion accepts one additional position, including
+                    // "last" after the current final item and "random" in [0,n].
+                    const size_t pos = resolveListIndex(index, list->items.size() + 1);
                     if (pos <= list->items.size()) {
                         list->items.insert(list->items.begin() + pos, item);
                         if (list->items.size() > MAX_LIST_ITEMS) list->items.pop_back();
