@@ -1,3 +1,6 @@
+#ifdef __XBOX__
+#include "pauseMenu.hpp"
+#endif
 #include "projectMenu.hpp"
 #include "projectSettings.hpp"
 #include "settings.hpp"
@@ -246,6 +249,10 @@ void ProjectMenu::render() {
     }
 
     if (backButton->isPressed({"b", "y"})) {
+#ifdef __XBOX__
+        showXboxSystemMenu();
+        return;
+#endif
         MainMenu *main = new MainMenu();
         MenuManager::changeMenu(main);
         return;
