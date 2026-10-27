@@ -174,10 +174,13 @@ Verified progress:
 - Entered the authored hidden passage, collected its apples and reached
   **14/35**. Releasing jump, moving left and then jumping restored the visible
   player; subsequent jumps climbed the staircase back onto the roof.
+- Cleared the upper-ledge enemy with two short follow-up A presses, crossed the
+  lower spikes and activated **checkpoint three at 16/35**. The next higher
+  platform and lower passage brought the count to **18/35**.
 - Enemy/spike collisions showed the breakup animation and returned to
-  checkpoint two. The final recovery retained all fourteen collected apples.
-- Back/Select opened runtime pause; B resumed. The console was left paused
-  after the final visible checkpoint recovery, with controller input released.
+  checkpoint two with fourteen apples retained. Later deaths returned to
+  checkpoint three with all eighteen apples retained.
+- Back/Select opened runtime pause and B resumed repeatedly.
 
 The transparent player outline inside the green ledge is the game's hidden
 tunnel, not evidence of death or missing terrain. Holding jump there can keep
@@ -187,13 +190,16 @@ Local evidence is under ignored `build-xbox/hardware/`: the
 `appel-normal98-lift1-gated1`, `lift2-gated2` and `roof-gated1` recordings;
 `appel-normal98-tunnel-follow8`, `tunnel-exit8`, `tunnel-exit9`,
 `tunnel-escape10`, `stairs-climb12` and `roof-return13`; and
-`appel-normal98-recovery21` / `checkpoint-final23`. Each full directory name
+`appel-normal98-recovery21` / `checkpoint-final23`. The later enemy crossing,
+checkpoint and recovery recordings are `appel-normal98-upper-cross24`,
+`spike-drop25`, `checkpoint3-jump26`, `high-platform28`, `lower-advance30`
+and `cp3-death-recovery37`. Each full directory name
 uses the `appel-normal98-` prefix and retains original JPEGs, timestamps,
 hashes and executed controller/observer sources.
 
-The upper ledge was reached briefly, but the follow-up enemy jump is not yet
-verified. Other attempts fell into the tunnel or hit spikes; they remain
-failures. **Normal-build Level 1 completion and victory replay remain open**,
-as do longer audio stability and subjective listening. The earlier diagnostic
-Level 1 win is a separate result. These recordings do not extend the frame-rate
-benchmark or establish retail 64MB support.
+The later platform gaps and low-ceiling route remain unfinished. Failed jumps
+and falls are retained. **Normal-build Level 1 completion and victory replay
+remain open**, as do audio acceptance checks. The earlier diagnostic Level 1
+win is a separate result. These recordings do not extend the frame-rate
+benchmark or establish retail 64MB support. See the [capture transport limits](xbox-audio-resampling.md#capture-transport-limits--october-27)
+before interpreting long network-audio recordings as playback continuity.

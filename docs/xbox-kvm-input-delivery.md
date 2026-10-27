@@ -205,3 +205,16 @@ are in ignored `paddle-input-trace-20261027/run3-analysis.json`,
 `run3-correlated-delay.json`, `hardware-run3-file-verification.json`,
 `sdl-source-comparison.json` and the corresponding
 `hardware/paddle-delivery3-*` controller/adapter records.
+
+## Normal-build camera comparison — October 27 evening
+
+Two bounded Appel runs compared 100ms and 200ms host refresh intervals while
+preserving immediate state-change sends. Both requested 350ms of Right after
+B resume, then one second of neutral. Camera-relative movement settled about
+0.5–0.6 seconds after the host's neutral command in both recordings. That
+observation includes video delay and game friction; it is not an isolated USB
+latency measurement. These two samples do not establish an improvement, so the
+host helpers were restored to 100ms. No runtime, firmware or KVM configuration
+was changed. Original frames and executed helper sources are retained in
+`hardware/appel-normal98-input100-42` and `input200-43` (both use the
+`appel-normal98-` prefix).
