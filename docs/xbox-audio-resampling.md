@@ -97,6 +97,10 @@ bounded comparison but did not eliminate them. Evidence is
 `appel-normal98-audio-only4{.wav,.json,-continuity.json,-kvm-end.log}` and
 `-transport-analysis.json`. The before/after console images show Appel still
 active at checkpoint three with eighteen apples; it was then paused safely.
-Subjective TV listening and loss-accounted long-run audio acceptance remain
-open. The local recorder also reported that its current mode needs H.264;
-no codec setting was changed for these tests.
+The user subsequently listened directly to the TV and confirmed clean Appel
+music without crackles or dropouts in this normal-build session. That passes
+the subjective listening check for this session; it does not make the KVM
+files gapless or qualify other games. The response is retained in
+`appel-normal98-tv-listening-confirmation.json`. Loss-accounted long-run audio
+continuity verification remains open. The local recorder also reported that its
+current mode needs H.264; no codec setting was changed for these tests.
