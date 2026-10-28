@@ -266,9 +266,9 @@ only in that guest fixture because its BIOS exposes 64MB; this is a startup
 correctness check, not a hardware performance or audio result.
 
 The candidate preserves Appel's project, authored update rate, physics and
-audio. The physical Xbox remains on the previous normal build while the user
-plays. **Hardware frame-time comparison and subjective movement confirmation
-remain pending; this candidate is not yet a proven smoothness fix.**
+audio. The physical comparison below shows an opening-area improvement.
+**Subjective movement confirmation and broader-level frame pacing remain open;
+this candidate is not a complete smoothness fix.**
 
 ### Candidate gameplay regression in xemu
 
@@ -292,3 +292,52 @@ controller evidence**. Audio was omitted only in the guest fixture; this adds no
 audio, full-level-completion or hardware-smoothness result. Local evidence is
 `build-xbox/appel-movement-smoothness/emulator-gameplay-verification.json` and
 its referenced original images, snapshots and executed input-probe source.
+
+### Physical movement comparison, October 27
+
+On the 128MB Xbox, the matched diagnostic builds used identical frame profiling
+with thread profiling OFF. Both loaded the unchanged installed controller-menu
+v3 project (`117188ba…`), with all music/assets present. The saved v2 identity
+was stale; a full FTP readback identified v3 before installation. Its differences
+from v2 are confined to the prepared menus and their controller-mode variable.
+
+Both controlled runs began at the same first wall with one apple. Eight
+Left 1.5-second / Right 2-second cycles stayed in that opening area and ended at
+the same wall. Only normal controller reports were sent; no game state was
+read or written through a debugger. No video connection ran during either
+28-second action.
+
+| Controlled movement metric | Main baseline | Candidate |
+| --- | ---: | ---: |
+| Complete 120-frame windows | 4 (480 frames) | 6 (720 frames) |
+| Rendered FPS | 24.48 | 27.65 |
+| Mean frame period | 40.85 ms | 36.16 ms |
+| Median of window p95 periods | 68.68 ms | 52.70 ms |
+| Longest observed frame in selected windows | 185.76 ms | 166.71 ms |
+| Mean input/hat phase per rendered frame | 2.55 ms | 1.17 ms |
+| Mean script phase per rendered frame | 17.78 ms | 16.53 ms |
+
+The selection includes **every complete reporting window fully inside each
+action**, excluding partial windows at either edge. Percentiles are reported
+per 120-frame window, then their median is shown; these are not pooled frame
+percentiles. Diagnostic reporting overhead is recorded separately and excluded
+by the profiler. An earlier replay reached different apple counts/positions and
+is explicitly excluded from this comparison.
+
+This is about 13% more rendered frames per second in one short movement test,
+with fewer slow frames. The remaining long frames and roughly 53 ms window p95
+mean **it still does not establish consistently smooth movement, 60 FPS, Mac
+equivalence or whole-level performance**. Several separate event-poll stalls
+also occurred during exploratory navigation; they need further isolation.
+
+Full upload/readback verification covered separate baseline (`0071466a…`),
+candidate (`8cfba7fa…`) and normal (`ac3142d7…`) executables. The primary dashboard
+launcher (`b75e9beb…`) and installed Appel file were preserved. The normal
+candidate is installed separately at
+`F:\scratch-appel-motion-20261027\default.xbe`, with profiling and UDP diagnostics
+OFF. TV movement acceptance is still pending.
+
+Local raw evidence and the reproducible selection script are under
+`build-xbox/appel-movement-smoothness/`: `hardware-comparison-results.json`,
+`analyze-comparison.py`, both referenced UDP logs/controller receipts, start/end
+JPEGs, the full Xbox runtime logs and `hardware-comparison-install.json`.
