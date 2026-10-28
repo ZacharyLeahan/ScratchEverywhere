@@ -44,6 +44,16 @@ contains no frame-profile format string. The enhanced profile can separate
 CPU drawing/queueing from SDL presentation and count long event polls; see the
 [Appel pacing notes](xbox-appel.md#next-pacing-diagnostic).
 
+A private xemu guest passed the prepared Appel menus, walking, jump ascent,
+first-apple collection, ground landing, solid-wall blocking, ledge clearance,
+second-apple collection and ledge landing. The normal candidate was used with
+exact installed v3 project JSON and nonaudio assets; 45 audio files were omitted
+only for the guest BIOS RAM limit. GDB supplied input keys while native input
+and key-hat functions executed. Game variables, positions and scores were only
+read, and native input ownership was restored before detaching. Checks waited
+for bounded gameplay events; debugger input-poll counts are not FPS evidence.
+Original framebuffer images confirm the player and terrain rendering.
+
 **Physical performance and visual acceptance remain pending.** Work-count and
 host checks do not establish an Xbox speedup. The running Xbox has not been
 changed. Candidate binaries, build/source manifests, the optional reference,
