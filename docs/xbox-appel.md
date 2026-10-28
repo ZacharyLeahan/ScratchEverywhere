@@ -364,4 +364,36 @@ python3 tests/xbox_frame_profile_test.py
 This instrumentation is compiled only with `SE_XBOX_PROFILE_FRAMES=ON`.
 It does not change the simulation/update rate or the normal renderer. It was
 added after the comparison above, so those results do not contain these new
-fields. The enhanced diagnostic has not yet been tested on physical hardware.
+fields. The first physical comparison exposed missing renderer build wiring:
+`render_phases`, `draw_us` and `present_us` were always zero. Those zero values
+mean the phases were not collected; the overall frame-period and scheduler
+measurements remain usable. The renderer now receives the profiling definition
+alongside the scheduler sources. Detailed tracing uses matching definitions in
+every caller. The host regression verifies shared counters across translation
+units and configures the real Xbox platform file in normal, frame-profile and
+detailed-profile modes.
+
+On October 28, separate diagnostic XBE `791bd454…` passed full FTP readback and
+two physical 28-second first-wall movement loops with the unchanged v3 project
+`117188ba…`. All ten complete 120-frame windows report `render_phases=120` and
+nonzero draw/present values; their sum stays within the broader render phase.
+There are no UDP sequence gaps in either measured interval. Video connections
+were closed during both actions; raw before/after images show the same
+one-apple/first-wall scene.
+
+The 1,200 measured frames average 27.63 FPS / 36.20 ms. Phase means are 16.11 ms
+for scripts, 3.83 ms for drawing and 9.37 ms for presentation; the median window
+p95 is 52.73 ms, with 237 frames over 50 ms and 25 over 67 ms. Presentation
+includes waits, and these window averages do not identify the phase responsible
+for each hitch. Player Three remains USB-configured with advancing completion
+counts; sampled send-error increases are 0 and 6, and receiver status ages reach
+6.01 seconds. That transport caveat remains explicit.
+
+This validates the measurement repair, not a performance improvement. Normal
+and profiling NXDK builds pass; the normal executable contains no profiler log
+string or profiling compile definitions. The primary dashboard launcher and
+project archives were not replaced. Immutable binaries/symbols, build/FTP
+receipts, original captures, closed UDP log, controller receipt and
+`physical-validation.json` are under ignored
+`build-xbox/render-phase-wiring-20261028/`. Startup/partial windows are excluded;
+the log receiver and controller were closed after the run.

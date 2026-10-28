@@ -325,7 +325,8 @@ endmacro()
 
 option(SE_XBOX_PROFILE_FRAMES "Log aggregated frame timing every 120 rendered frames" OFF)
 if(SE_XBOX_PROFILE_FRAMES)
-    set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/runtime_loop.cpp"
+    set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/source/renderers/xbox/renderer_xbox.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/runtime_loop.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/bytecode_executor.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/executor/BlockExecutorThreads.cpp"
         APPEND PROPERTY COMPILE_DEFINITIONS SE_XBOX_PROFILE_FRAMES)
@@ -336,7 +337,9 @@ if(SE_XBOX_PROFILE_THREADS)
     if(NOT SE_XBOX_PROFILE_FRAMES)
         message(FATAL_ERROR "Thread profiling requires SE_XBOX_PROFILE_FRAMES")
     endif()
-    set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/runtime_loop.cpp"
+    # Keep conditional inline profiler definitions identical in every caller.
+    set_property(SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/source/renderers/xbox/renderer_xbox.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/runtime_loop.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/bytecode_executor.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/source/runtime/executor/BlockExecutorThreads.cpp"
         APPEND PROPERTY COMPILE_DEFINITIONS SE_XBOX_PROFILE_THREADS)
