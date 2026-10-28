@@ -28,6 +28,7 @@ for (int i=0;i<120;++i) {
     XboxFrameProfile::work(.2,4.5);
     XboxFrameProfile::work(0,1.5);
     XboxFrameProfile::thread("Player",6,false);
+    XboxFrameProfile::render(2,5);
     Timer::now += 40;
     XboxFrameProfile::sample(7);
 }
@@ -40,9 +41,24 @@ for (const auto *expected : {"fps_x100=2500", "mean_us=40000", "p95_us=40000", "
     else assert(s.find(expected)!=s.npos);
 }
 assert(Log::lines[1].find("frame_us=6000 calls=120")!=std::string::npos);
+for (const auto *expected : {"draw_us=2000", "present_us=5000", "render_phases=120", "slow_polls=0", "over_50ms=0", "over_67ms=0"})
+    assert(s.find(expected)!=s.npos);
 assert(XboxFrameProfile::count==0 && XboxFrameProfile::passes==0 && XboxFrameProfile::threads.empty());
+assert(XboxFrameProfile::renderPhases==0 && XboxFrameProfile::drawSum==0 && XboxFrameProfile::presentSum==0);
+for (int i=0;i<120;++i) {
+    XboxFrameProfile::poll(i==0 ? 18 : .1);
+    XboxFrameProfile::poll(2); // Multiple polls per rendered frame must count.
+    XboxFrameProfile::work(0,1);
+    Timer::now += i==0 ? 60 : i==1 ? 80 : 40;
+    XboxFrameProfile::sample(7);
+}
+assert(Log::lines.size()==3);
+const auto &next=Log::lines[2];
+for (const auto *expected : {"mean_us=40500", "draw_us=0", "present_us=0", "render_phases=0", "poll_max_us=18000", "slow_polls=1", "over_50ms=2", "over_67ms=1"})
+    assert(next.find(expected)!=next.npos);
+assert(XboxFrameProfile::slowPolls==0 && XboxFrameProfile::pollMax==0);
 }
 ''')
     subprocess.run(['c++', '-std=c++17', '-I'+str(tmp), '-I'+str(root/'include'), str(tmp/'test.cpp'), '-o', str(tmp/'test')], check=True)
     subprocess.run([str(tmp/'test')], check=True)
-print('PASS: integer timing units, percentiles, scheduler totals, sprite costs, reset')
+print('PASS: integer timing units, percentiles, scheduler totals, sprite costs, draw/present phases, slow polls, hitch counts, window reset')
