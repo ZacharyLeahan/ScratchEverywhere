@@ -188,3 +188,38 @@ Ignored evidence: `build-xbox/hardware/tetris-pen-regression-verification.json`,
 `tetris-pen-normal-lines1*`, and `tetris-pen-normal-four{1,2,3,4,5}*`.
 The verification record identifies the executed helper hashes, original images,
 failed observations and remaining four-line/audio checks.
+
+## Ordinary four-line clear in xemu
+
+A fresh private xemu game on October 27 used the unchanged original project,
+including every audio asset, and the normal diagnostics-off executable from
+the merged runtime improvement (PR #33). Its XBE SHA-256 is
+`99dd3dec7234b5f070014a960000d3066903c6dd00215d9bdb4f7adab922ee27`.
+
+Fifteen ordinary placements used all seven piece families and completed a
+**four-line clear: Lines 4, Score 1200, Level 0**. The initial board and HUD
+were zero. GDB supplied arrow/Space input while native input and key-hat
+functions executed; it did not set the grid, piece sequence, RNG, game
+variables or score. The planner used the current piece and remaining bag
+membership, with no knowledge of future draw order.
+
+After each hard drop, the native grid, line count and score matched the
+placement. A separate auditor replayed the recorded placements from the
+original shape templates using colored coordinate cells, verified every
+recorded board and score, and checked the native post-drop snapshots. The
+original framebuffer independently shows Lines 4 and Score 1200. Native input
+was restored before GDB detached, and the disposable guest was closed.
+
+This verifies the ordinary four-line/scoring path on that executable in xemu.
+**A physical Xbox four-line clear and subjective audio checks remain open.**
+The private guest used a dummy host audio driver; it supplies no listening or
+frame-rate evidence. An earlier attempt ended naturally after a debugger
+handoff allowed play to advance; that attempt is preserved separately and is
+not included in the successful run.
+
+Ignored evidence is under `build-xbox/tetris-fourline-20261027/`:
+`fixture.json` and `attempt-02/{result.json,independent-audit.json,gdb.log,
+initial.png,four-line-clear.png}`. The exact executed driver and input helper
+are preserved alongside those records. The independent audit verifies all
+15 colored boards, a four-row clear on placement 15 and the authored
+1200-point award.
