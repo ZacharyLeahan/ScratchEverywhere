@@ -1,4 +1,4 @@
-# Sokoban puzzle-ten repair
+# Sokoban puzzle repairs
 
 Gammastr20's [Sokoban](https://scratch.mit.edu/projects/24490009/) has passed
 puzzles one through three on the Xbox. The downloaded tenth puzzle contains
@@ -17,7 +17,7 @@ python3 scripts/prepare-sokoban.py ORIGINAL.sb2 PREPARED.sb2
 python3 scripts/verify-sokoban-solution.py PREPARED.sb2 examples/sokoban-level10-solution.json
 ```
 
-The preparation tool accepts only the tested original archive and refuses an
+The default preparation accepts only the tested original archive and refuses an
 existing output or replacement of its source. It opens three floor cells:
 
 - `(12, 3)` and `(12, 4)` provide a downward escape for the corner crate.
@@ -110,3 +110,55 @@ loop check uses the same unchanged music asset.
 
 Local preparation, solver, archive-comparison and runtime evidence is in ignored
 `build-xbox/hardware/sokoban-*` and `build-xbox/xemu-sokoban-level10/`.
+
+## Optional complete puzzle set — candidate
+
+The default command and its `efdbc005…` archive remain unchanged. Add
+`--all-puzzles` to prepare the additional authored-project repairs:
+
+```sh
+python3 scripts/prepare-sokoban.py --all-puzzles ORIGINAL.sb2 FULL.sb2
+python3 scripts/verify-sokoban-solution.py FULL.sb2 examples/sokoban-all-puzzles-solutions.json
+python3 tests/sokoban_all_puzzles_test.py ORIGINAL.sb2
+```
+
+This option still starts from the tested original `6b2ea446…` archive. It keeps
+the puzzle-ten access repair and adds:
+
+- **Completed-goal scan:** the authored loop increments its index before reading
+  a tile. Starting at one skips the first cell and reads past the end. Starting
+  at zero makes it visit cells one through N. Puzzles nine and twelve have a
+  goal in that first cell: the previous loop counts nine of ten and three of
+  four completed goals, respectively.
+- **Puzzle twelve height:** its header declares nine rows of seven cells, while
+  its data contains ten rows. Height ten draws every existing row. All seventy
+  tiles, crates and goals are retained.
+- **Puzzle thirteen start:** `(9, 7)` is an inaccessible tile. The player starts
+  one cell up at `(9, 6)`, on existing floor. Its map, crates and goals are retained.
+
+These are Scratch project adaptations, with no engine or Xbox-only code change.
+The optional copy changes three puzzle records and one loop initializer; all
+nine assets and every other project value are preserved. Reversing those four
+edits restores the original parsed project. The candidate SHA-256 is
+`8253ed9a8dc8106525d1121880549bfa24de969223f0a360e4cc331ec880d05b`.
+
+The saved thirteen routes independently replay **2,728 moves / 628 pushes**.
+The verifier checks complete, unique puzzle coverage, legal walking/pushing,
+first completion and archive identity. Its existing single-puzzle command is
+preserved. The regression check also interprets the actual finite goal-count
+loop, verifies corrected counts on every solved map, checks asset/project
+preservation and rejects overwrite and wrong-source attempts.
+
+An ordinary level-one start in the private xemu guest has passed puzzles one
+through seven, comparing every player position and map cell with the independent
+routes. Testing uses the normal `ac3142d7…` Xbox executable from the Appel
+optimization candidate, with profiling off. GDB supplies keys before native
+key-hat dispatch; project variables, maps, scores and positions are only read.
+The full thirteen-puzzle run and natural wrap back to puzzle one remain pending.
+Debugger pacing and private host audio output do not establish FPS or sound quality.
+
+**This candidate has not been installed or tested on the physical Xbox.** The
+installed default prepared archive remains `efdbc005…`. Later hardware play,
+complete normal playthrough and audio qualification remain open. Local source,
+independent replay and ongoing runtime evidence are under ignored
+`build-xbox/sokoban-full-20261027/` in the primary checkout.
