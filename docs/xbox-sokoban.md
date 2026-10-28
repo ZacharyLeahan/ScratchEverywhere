@@ -150,8 +150,10 @@ loop, verifies corrected counts on every solved map, checks asset/project
 preservation and rejects overwrite and wrong-source attempts.
 
 An ordinary level-one start in the private xemu guest has passed puzzles one
-through seven, comparing every player position and map cell with the independent
-routes. Testing uses the normal `ac3142d7…` Xbox executable from the Appel
+through nine and advanced naturally to ten at move 1,312. A separate replay audit
+verified all 1,312 moves / 248 pushes, comparing every player position, map cell
+and level transition with the independent routes. This includes actual puzzle
+nine goal recognition after filling its previously skipped first-cell goal. Testing uses the normal `ac3142d7…` Xbox executable from the Appel
 optimization candidate, with profiling off. GDB supplies keys before native
 key-hat dispatch; project variables, maps, scores and positions are only read.
 The full thirteen-puzzle run and natural wrap back to puzzle one remain pending.
