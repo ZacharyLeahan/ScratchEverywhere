@@ -149,18 +149,35 @@ preserved. The regression check also interprets the actual finite goal-count
 loop, verifies corrected counts on every solved map, checks asset/project
 preservation and rejects overwrite and wrong-source attempts.
 
-An ordinary level-one start in the private xemu guest has passed puzzles one
-through nine and advanced naturally to ten at move 1,312. A separate replay audit
-verified all 1,312 moves / 248 pushes, comparing every player position, map cell
-and level transition with the independent routes. This includes actual puzzle
-nine goal recognition after filling its previously skipped first-cell goal. Testing uses the normal `ac3142d7…` Xbox executable from the Appel
-optimization candidate, with profiling off. GDB supplies keys before native
-key-hat dispatch; project variables, maps, scores and positions are only read.
-The full thirteen-puzzle run and natural wrap back to puzzle one remain pending.
-Debugger pacing and private host audio output do not establish FPS or sound quality.
+An ordinary level-one start in the private xemu guest completed **all thirteen
+puzzles and the natural wrap to puzzle one**. A separate audit replayed all
+**2,728 moves / 628 pushes**, comparing every recorded player position, map
+cell, solved puzzle and natural transition with independent routes. This
+includes puzzle nine and twelve recognition after filling their previously
+skipped first-cell goals, and the corrected puzzle-thirteen start. A final
+read-only check verified the live first-puzzle map and player with the
+cumulative counter at 2,728; its original framebuffer shows Level 1 / Moves 2728
+and independently matches all 25 tiles and the player.
+
+Testing used the normal `ac3142d7…` Xbox executable from the runtime improvement
+now merged in PR #33, with profiling off. GDB supplied keys before native
+key-hat dispatch; project variables, maps, scores, RNG and positions were only
+read. The same guest and verified prefix were retained across two bounded
+debugger segments. Native input was restored before detaching. Debugger pacing
+and private host audio output do not establish FPS or sound quality.
+
+**An emulator visual issue remains open.** Pixel classification of the thirteen
+initial framebuffers matched 793 of 796 cells and every player. Three samples
+in the puzzle-ten image differed from its correct logical map. A separate
+explicit delayed-puzzle-ten fixture on the same executable matched all 120
+cells and the player in five captures, including a frozen repeat and later
+native input polls. That clean targeted result does not explain the earlier
+mismatch or establish a visually clean full run. Both sets of original images
+are preserved. The disposable guests and debuggers are closed.
 
 **This candidate has not been installed or tested on the physical Xbox.** The
-installed default prepared archive remains `efdbc005…`. Later hardware play,
-complete normal playthrough and audio qualification remain open. Local source,
-independent replay and ongoing runtime evidence are under ignored
-`build-xbox/sokoban-full-20261027/` in the primary checkout.
+installed default prepared archive remains `efdbc005…`. A complete physical
+playthrough, full-set visual acceptance and audio qualification remain open. Local source,
+independent replay and completed runtime evidence are under ignored
+`build-xbox/sokoban-full-20261027/` in the primary checkout; the separate visual
+probe is under `build-xbox/sokoban-stamp-forensics-20261027/`.
