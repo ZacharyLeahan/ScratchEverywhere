@@ -341,3 +341,27 @@ Local raw evidence and the reproducible selection script are under
 `build-xbox/appel-movement-smoothness/`: `hardware-comparison-results.json`,
 `analyze-comparison.py`, both referenced UDP logs/controller receipts, start/end
 JPEGs, the full Xbox runtime logs and `hardware-comparison-install.json`.
+
+### Next pacing diagnostic
+
+The optional frame profiler now separates CPU drawing/queueing (`draw_us`) from
+the complete `SDL_RenderPresent` call (`present_us`). Presentation includes queue
+submission, GPU completion and vblank waiting; it is not a GPU-only measurement.
+`render_phases` counts how many rendered frames supplied that breakdown.
+Values remain averages per rendered frame across the same 120-frame window.
+
+Each window also reports `poll_max_us`, the number of event polls lasting at
+least one 60 Hz display interval (`slow_polls`), and frame periods exceeding
+50 or 67 ms (`over_50ms`, `over_67ms`). These expose individual stalls that an
+average poll time or average FPS can hide. All new counters reset per window.
+The host test exercises the actual profiler with multiple scheduler polls,
+different frame periods and two consecutive reporting windows:
+
+```sh
+python3 tests/xbox_frame_profile_test.py
+```
+
+This instrumentation is compiled only with `SE_XBOX_PROFILE_FRAMES=ON`.
+It does not change the simulation/update rate or the normal renderer. It was
+added after the comparison above, so those results do not contain these new
+fields. The enhanced diagnostic has not yet been tested on physical hardware.
