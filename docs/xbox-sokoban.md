@@ -171,9 +171,12 @@ initial framebuffers matched 793 of 796 cells and every player. Three samples
 in the puzzle-ten image differed from its correct logical map. A separate
 explicit delayed-puzzle-ten fixture on the same executable matched all 120
 cells and the player in five captures, including a frozen repeat and later
-native input polls. That clean targeted result does not explain the earlier
-mismatch or establish a visually clean full run. Both sets of original images
-are preserved. The disposable guests and debuggers are closed.
+native input polls. A second explicitly prepared pre-win-puzzle-nine fixture
+used one ordinary Left move to advance naturally to ten; all six captured
+maps/players matched (696 sampled cells). Both targeted probes use the same
+executable and retain all assets. These clean results do not explain the earlier
+mismatch or establish a visually clean full run. All original images are
+preserved. The disposable guests and debuggers are closed.
 
 **This candidate has not been installed or tested on the physical Xbox.** The
 installed default prepared archive remains `efdbc005…`. A complete physical
