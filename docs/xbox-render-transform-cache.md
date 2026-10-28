@@ -54,8 +54,49 @@ read, and native input ownership was restored before detaching. Checks waited
 for bounded gameplay events; debugger input-poll counts are not FPS evidence.
 Original framebuffer images confirm the player and terrain rendering.
 
-**Physical performance and visual acceptance remain pending.** Work-count and
-host checks do not establish an Xbox speedup. The running Xbox has not been
-changed. Candidate binaries, build/source manifests, the optional reference,
-preprocessing proof and private emulator checks are kept locally under ignored
-`build-xbox/appel-transform-cache-20261027/`.
+## Physical comparison — October 28
+
+The 128 MB Xbox ran both profiling executables at forced 480p with the same
+prepared Appel v3 archive (`117188ba…`) and controller profile. Separate test
+folders and full FTP readbacks preserve executable identity; the primary Games
+launcher remains `b75e9beb…`. Each build reached Level 1, walked to the first
+wall with one apple, and ran two identical 28-second left/right loops. Bounded
+video captures finished before each timed action and confirmed the expected
+wall/one-apple endpoints afterwards.
+
+Every complete 120-frame window enclosed by an action is included; partial
+boundary windows are excluded. Diagnostic packet sequences have no gaps in
+the timed intervals. FPS derives from device frame periods. Each route has
+equal sampled frame counts for both builds: 1,320 on Player Two and 1,440 on
+Player Three.
+
+| Route | Baseline FPS | Cache FPS | Baseline frames over 50 ms | Cache frames over 50 ms |
+| --- | ---: | ---: | ---: | ---: |
+| Player Two | 27.79 | 28.46 | 18.64% | 12.05% |
+| Player Three repeat | 28.04 | 27.55 | 15.63% | 18.82% |
+
+The initial apparent gain did not repeat. Both routes still have median
+window-p95 frame times near 53 ms and individual frames around 168–186 ms.
+**No repeatable hardware speedup is established; keep this experiment draft.**
+The known-good normal `ac3142d7…` build is restored for play. These short loops
+do not establish whole-level performance, subjective TV smoothness, Mac-like
+pacing or retail 64 MB support.
+
+Controller delivery limits the comparison. Every sampled active adapter
+reported USB configured and its completion counters advanced, but Player Two
+had redundant UDP send errors and late reported directions. Player Three had
+substantially fewer send errors (24 across baseline trials, zero across cache
+trials), although control acknowledgements still varied. Its reversed result
+does not by itself prove a cache regression; it prevents promoting the earlier
+small gain as a reliable improvement.
+
+The optional `draw_us`, `present_us` and `render_phases` fields are zero in both
+builds. `cmake/platforms/xbox.cmake` applies the profiling definition to runtime
+sources but omits `source/renderers/xbox/renderer_xbox.cpp`. These zeros are not
+CPU/GPU measurements. Fix that wiring before using the phase breakdown to
+locate the remaining pauses; overall frame-period measurements remain valid.
+
+Original logs, controller receipts, image hashes, build manifests and analysis
+are under ignored `build-xbox/appel-transform-cache-20261027/`, including
+`comparison-report-20261028.json`, both `comparison-results*-20261028.json`
+files and `hardware-comparison-install-20261028.json`.
