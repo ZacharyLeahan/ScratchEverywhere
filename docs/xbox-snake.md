@@ -57,3 +57,41 @@ pending pause-menu confirmation; they are not browser-return evidence.
 
 The final retrieved runtime log confirms profile loading, project cleanup and
 browser return (`frog-snake-catch-controls.log`).
+
+## Clock and ending audio — October 28, 2026
+
+A normal diagnostics-off `ac3142d7…` run on the physical Xbox collected fruit,
+grew the tail and visibly picked up a clock. Original HDMI frames show the clock
+at approximately (342, 208), the head approaching from the left, its disappearance
+and continued upward movement. The authored movement delay changes from 0.125 to
+0.25 seconds. Median observed cell intervals increased from 0.153 to 0.291 seconds
+(about 1.90×); these are video receive times, not precise simulation timing.
+The four-second restoration under uninterrupted play remains unverified.
+
+The planner reads HDMI pixels only. Static project inspection confirms movement
+in 24-unit steps and the authored head X offset of −12; screen steps are 36×32
+pixels. One tail corner falsely matched the head at run second 23.358. That raw
+sample is retained and excluded from the interval calculation; the original
+clock/approach/after frames were independently viewed.
+
+A continuation reached the ordinary boundary loss at **Score 175**. Later
+Green Flag replays included a Score 0 boundary ending. These are not tail
+self-collision passes. One helper incorrectly released direction after leaving
+its artificial safety bounds; another lost head confidence. Those attempts and
+their receipts remain separate from accepted gameplay evidence. Blade pickup
+and explicit self-collision remain open.
+
+A separate 60-second HDMI capture contains the tail of the authored Game Over
+cue after a Score 0 ending, followed by digital silence from capture second 8.
+The first five one-second probes match original source offsets 0.875875 through
+4.875875 seconds with correlations 0.99666–1.00000. It contains exactly 2,880,000
+stereo frames at 48 kHz, peak 0.03644, without clipping; receipt time is 60.77
+seconds. It is not an active gameplay minute or a subjective listening pass.
+
+Ignored evidence: `build-xbox/hardware/snake-clock-physical-audit-20261028.json`,
+`snake-grid-attempt1-20261028-{result,client}.json` and its original frames;
+`snake-grid-resume2-20261028-frames/ending.jpg`; the separately retained
+`snake-grid-fresh{3,4}-20261028*` failures; and
+`snake-grid-long-audio-20261028.{wav,json}` with
+`snake-ending-audio-match-20261028.json`. The installed original archive and
+normal executable passed full FTP readbacks after this batch.
