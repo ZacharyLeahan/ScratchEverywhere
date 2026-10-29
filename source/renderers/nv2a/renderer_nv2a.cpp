@@ -2195,7 +2195,8 @@ void Renderer_NV2A::renderPenLayer() {
     };
 
     bindTexture(&s_penTexture, false);
-    setBlendMode(NV2ABlendMode::Blend);
+    // Drawing into the pen target has already multiplied RGB by alpha.
+    setBlendMode(NV2ABlendMode::Premultiplied);
     drawTriangles(quad, 6);
 }
 

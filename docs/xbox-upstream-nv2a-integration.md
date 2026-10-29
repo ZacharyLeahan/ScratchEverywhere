@@ -68,6 +68,19 @@ Both comparison guests report the standard-memory policy despite the emulator's
 128MB configuration: the backdrop raster is 334×249 in a 16-bit texture. This
 neither qualifies a retail 64MB Xbox nor proves title-visible expanded RAM.
 
+The existing color/pen fixture reaches PASSES=5 / ERRORS=0 / CYCLES=40,
+but only 98 of 107 expected image samples pass. The frozen pre-SVG build has
+the same values at all 107 samples: these brightness/hue/pen mismatches predate
+the SVG fix. Native rendering is not fully qualified.
+
+Pen compositing now avoids multiplying stored alpha a second time. In a paired
+fixture with hue and brightness disabled only on the two pen stamps, the
+half-transparent red stamp improves from RGB (71,16,25) to (135,16,25), versus
+expected (136,16,24); the opaque stamp and all other 106 samples are unchanged.
+The full original fixture still passes 98/107: its brightened translucent stamp
+improves substantially but remains outside tolerance, alongside eight other
+brightness/hue samples. These remain open, as do physical pen/audio checks.
+
 The final post-theme XBE `f79fcd52...` also reaches the native launcher twice,
 once after the controller reboot. A 90-video-frame reset hold does not reboot;
 release cancels it, and a fresh full hold reaches `XReboot` after 122 frames.
