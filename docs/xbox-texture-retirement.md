@@ -83,3 +83,9 @@ records are retained locally under ignored `build-xbox/sokoban-texture-lifetime-
 `build-xbox/texture-lifetime-fixture-20261028`,
 `build-xbox/texture-retirement-color-regression-20261028` and
 `build-xbox/hardware/texture-retirement-20261028`.
+
+A further physical Snake run on the normal candidate rendered the board/tail,
+collected fruit after Green Flag replay and later showed Score 125. Its planned
+self-collision did not reach the tail, and controller connectivity subsequently
+became unavailable across all four adapters. These are limited compatibility
+observations; see the [input-delivery evidence](xbox-kvm-input-delivery.md).
