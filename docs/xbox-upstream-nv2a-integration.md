@@ -380,6 +380,18 @@ are not accepted. No runtime or game changes were needed in this batch.
 See [the full-wave proof, failed host strategies and exact scope](xbox-space-invaders.md#native-emulator-full-wave--october-29-2026).
 Physical full-wave/audio, pacing and 64 MB gates remain open.
 
+## PacMan native full board — October 29
+
+Original `283feafd…` on native `4ef49719…` collects all 92 dots/bonuses and eats
+one frightened ghost for **Score 1,380**, with visible You Won. Short Start from
+Win and ordinary Game Over, renewed controls, fresh actual-archive browser launch
+and two held Exits pass; both cleanups leave zero sprites and the exact 21-game /
+42-button list. The saved HDD and all manifest sources remain unchanged. No
+runtime or game changes were needed. High Score lags at **1,370** and remains an
+open issue; settled-Win silence adds no active-play audio acceptance.
+See [the same-round evidence, host corrections and exact limits](xbox-pacman.md#native-emulator-full-board--october-29-2026).
+Physical full-board/ghost, pacing and 64 MB gates remain open.
+
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
 texture/pen behavior, and continue every open gate in the
