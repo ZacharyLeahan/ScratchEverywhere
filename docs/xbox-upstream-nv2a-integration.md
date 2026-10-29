@@ -51,6 +51,13 @@ The earlier incorrectly selected Breakout run is retained separately and does
 not supply this Catch evidence. Game Over text has visible edge artifacts;
 rendering quality and audio remain open checks.
 
+The final post-theme XBE `f79fcd52...` also reaches the native launcher twice,
+once after the controller reboot. A 90-video-frame reset hold does not reboot;
+release cancels it, and a fresh full hold reaches `XReboot` after 122 frames.
+The app starts again and the native launcher redraws correctly. This emulator's
+inserted DVD launches the app again; it does not establish physical dashboard
+recovery or recovery from a blocked game loop. Inputs were neutral afterwards.
+
 The installed stock Mac xemu cannot provide Vulkan and falls back to OpenGL.
 Its earlier startup used the legacy Xbox renderer (IDs 4/1), so it does not count
 as native NV2A evidence. The private Vulkan test explicitly selects NV2A,
