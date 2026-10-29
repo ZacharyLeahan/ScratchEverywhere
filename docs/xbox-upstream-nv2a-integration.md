@@ -191,18 +191,32 @@ Hardware artwork and performance qualification remain pending.
 
 ## Appel extended native playthrough — October 29
 
-The same `807d1928...` executable and complete controller-menu archive
-`117188ba...` repeat both moving lifts and the roof, collect hidden-passage
-apples, and clear the spike tower onto the next roof. A running takeoff near
-world X=2826 reaches X=3186 / Y=317.01 on that roof. These are ordinary emulated
-USB controller actions, timed with read-only position observations; no game
-variables, collision rules, assets or input polling were changed.
+The unchanged `807d1928...` executable and complete controller-menu archive
+`117188ba...` now finish Level One with **21/35 apples** and the authored victory
+menu. Read-only inspection confirms WIN, LEVEL #=2 (the author's Level One),
+X=5809.36, Y=557.01 and SPAWN IDX=1249. Ordinary emulated USB controller actions
+cross both lifts, the spike tower, roof enemies and lower spikes; checkpoint
+three activates and a later death respawns there with all sixteen apples retained.
+The later route drops to the ledge beneath the spiked block, crosses underneath,
+jumps back onto its clear right side, then crosses the isolated platforms and
+final gap. No game-state writes, altered collision rules or input-poll bypass
+were used; read-only position observations helped time takeoffs.
 
-The following enemy approach collects apple fourteen and ends in a natural
-death. Respawn retains 14/35 at checkpoint two: PLAY, X=2190, Y=197.01,
-SPAWN IDX=421, with the death flag cleared. The third checkpoint, Level One
-victory and victory replay remain open. This is emulator gameplay evidence;
-it does not qualify physical Xbox pacing, audio or controller delivery.
+Controller mouse mode (White + D-pad, then White + RT) activates the authored
+**Try Again** button. The fresh round shows 0/35 and 0:00.0; Right/A restore
+walking and jumping, and read-only inspection confirms PLAY with no checkpoint.
+Back / Return to game list redraws the populated browser. Direct D-pad/A focus
+on the victory menu is still missing from the prepared project; its title and
+level-picker navigation are separate.
+
+The 3.883-second emulated APU capture across completion contains no clipped
+samples or zero 256-sample blocks. The full original completion cue matches
+at correlation 0.943; this bounded comparison does not establish every cue or
+physical TV sound. A fresh browser launch also reaches Appel's title and exits,
+but that private HDD fixture lacks the controller-menu variables and is excluded
+from prepared-copy relaunch acceptance. Refresh that fixture before repeating
+prepared-copy browser launch. Physical Level One/replay, pacing, audio and the
+other hardware qualification gates remain open.
 
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
