@@ -67,6 +67,17 @@ the controller-delivery gate open. A missed input versus delayed capture has
 not been isolated. This is targeted rendering evidence, not full game, audio,
 controller-delivery, or 64MB acceptance.
 
+Appel also passed a physical normal-build smoke check: title and level picker,
+level-one terrain, two rightward jump sequences with scrolling and collection
+from zero to two apples, then a clean Return to game list. This is limited
+gameplay/cleanup evidence; it does not establish full-level completion or FPS.
+The retrieved normal log confirms project cleanup, browser activation and the
+controller dashboard-reset chord. The two added diagnostic archives and their
+profiles were hash-checked, backed up locally and removed after testing. Full
+readbacks reconfirmed the primary `b75e9beb...` launcher, prior `ac3142d7...`
+normal app and canonical `efdbc005...` Sokoban archive were unchanged. The
+separate candidate remains installed; the console was returned to XBMC.
+
 Raw matching binaries, source/build receipts, native images and controller/video
 records are retained locally under ignored `build-xbox/sokoban-texture-lifetime-20261028`,
 `build-xbox/texture-lifetime-fixture-20261028`,
