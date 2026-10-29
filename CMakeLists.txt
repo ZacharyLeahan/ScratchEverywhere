@@ -106,21 +106,6 @@ cmake_dependent_option(SE_CLOUDVARS "Enable cloud variables." ON "SE_ALLOW_CLOUD
 # This tbh should probably work on all of these platforms (except MAYBE PSP..) but i lowkey dont want to test it rn
 cmake_dependent_option(SE_DOWNLOAD "Enable the ability to use the internet to download files, such as Text-To-Speech blocks." ON "SE_ALLOW_DOWNLOAD" OFF)
 
-if(NOT DEFINED SE_USE_LWMEM_DEFAULT)
-    set(SE_USE_LWMEM_DEFAULT OFF)
-endif()
-option(SE_USE_LWMEM "Route all memory management calls (malloc, free, etc.) through lwmem. Experimental, but helps reduce memory fragmentation." ${SE_USE_LWMEM_DEFAULT})
-
-if(SE_USE_LWMEM)
-    if(DEFINED SE_LWMEM_HEAP_SIZE_MB AND DEFINED SE_LWMEM_GPU_RESERVE_MB)
-        math(EXPR SE_LWMEM_HEAP_SIZE_BYTES "${SE_LWMEM_HEAP_SIZE_MB} * 1024 * 1024")
-        math(EXPR SE_LWMEM_GPU_RESERVE_BYTES "${SE_LWMEM_GPU_RESERVE_MB} * 1024 * 1024")
-    else()
-        message(STATUS "LwMEM disabled: SE_LWMEM_HEAP_SIZE_MB and SE_LWMEM_GPU_RESERVE_MB must both be defined.")
-        set(SE_USE_LWMEM OFF)
-    endif()
-endif()
-
 option(SE_MENU "Enables the SE! Main Menu." ON)
 if(SE_LIBRARY)
     set(SE_MENU OFF CACHE BOOL "Enables the SE! Main Menu." FORCE)
@@ -181,7 +166,7 @@ cmake_dependent_option(SE_INSPECTOR "Enables the runtime Inspector." ON "SE_PLAT
 
 list(APPEND SE_RENDERER_VALID_OPTIONS "headless" "all")
 if(NOT DEFINED SE_RENDERER_PRIORITY)
-    set(SE_RENDERER_PRIORITY "all" "d3d9" "opengl_core" "xbox" "gx2" "sdl2" "sdl3" "opengl" "gdi" "sdl1" "citro2d" "gl2d" "headless")
+    set(SE_RENDERER_PRIORITY "all" "d3d9" "opengl_core" "nv2a" "xbox" "gx2" "sdl2" "sdl3" "opengl" "gdi" "sdl1" "citro2d" "gl2d" "headless")
 endif()
 set_preferred_cache_var(SE_RENDERER "${SE_RENDERER_PRIORITY}" "${SE_RENDERER_VALID_OPTIONS}" "Select the desired renderer backend.")
 
@@ -214,7 +199,7 @@ if(SE_WINDOWING_VALID_OPTIONS)
     list(REMOVE_DUPLICATES SE_WINDOWING_VALID_OPTIONS)
 endif()
 
-set(SE_WINDOWING_PRIORITY "all" "glfw" "sdl3" "sdl2" "sdl1" "win32" "3ds" "nds" "wiiu" "headless" "libretro")
+set(SE_WINDOWING_PRIORITY "all" "glfw" "nv2a" "sdl3" "sdl2" "sdl1" "win32" "3ds" "nds" "wiiu" "headless" "libretro")
 set_preferred_cache_var(SE_WINDOWING "${SE_WINDOWING_PRIORITY}" "${SE_WINDOWING_VALID_OPTIONS}" "Select the desired windowing backend.")
 
 add_library(windowing_interface INTERFACE)
@@ -616,14 +601,6 @@ endif()
 if(SE_DOWNLOAD)
     target_compile_definitions(se-interface INTERFACE ENABLE_DOWNLOAD)
     cl_add_dep(se-interface libcurl)
-endif()
-if(SE_USE_LWMEM AND DEFINED SE_LWMEM_HEAP_SIZE_MB AND DEFINED SE_LWMEM_GPU_RESERVE_MB)
-    target_compile_definitions(se-interface INTERFACE
-        SE_USE_LWMEM
-        SE_LWMEM_HEAP_SIZE=${SE_LWMEM_HEAP_SIZE_BYTES}u
-        SE_LWMEM_GPU_RESERVE_BYTES=${SE_LWMEM_GPU_RESERVE_BYTES}u
-    )
-    cl_add_dep(se-interface lwmem)
 endif()
 if(SE_CLOUDVARS)
     target_compile_definitions(se-interface INTERFACE ENABLE_CLOUDVARS)

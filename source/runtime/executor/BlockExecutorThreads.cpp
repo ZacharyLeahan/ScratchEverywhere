@@ -128,6 +128,13 @@ void BlockExecutor::runThreads() {
         i++;
     }
 
+    cleanupSprites();
+    if (stopClicked) {
+        Scratch::stopClicked();
+    }
+}
+
+void BlockExecutor::cleanupSprites() {
     Scratch::sprites.erase(
         std::remove_if(Scratch::sprites.begin(), Scratch::sprites.end(),
                        [](Sprite *s) {
@@ -157,9 +164,6 @@ void BlockExecutor::runThreads() {
             Scratch::sprites[i]->layer = (Scratch::sprites.size() - 1) - i;
         }
         sortSprites = false;
-    }
-    if (stopClicked) {
-        Scratch::stopClicked();
     }
 }
 

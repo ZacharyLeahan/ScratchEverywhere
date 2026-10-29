@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 root = Path(__file__).resolve().parents[1]
 source = (root/'source/runtime/runtime_costumes.cpp').read_text()
-function = source[source.index('void Scratch::flushCostumeImages()'):source.index('void Scratch::freeUnusedCostumeImages()')]
+function = source[source.index('void Scratch::flushCostumeImages()'):source.index('void Scratch::freeUnusedCostumeImages(')]
 with tempfile.TemporaryDirectory(prefix='costume-cache-lifetime-') as tmp:
     tmp = Path(tmp)
     (tmp/'test.cpp').write_text(r'''

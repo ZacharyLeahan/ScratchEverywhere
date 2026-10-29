@@ -1,6 +1,8 @@
 #include "renderer_xbox.hpp"
 #include "speech_manager_xbox.hpp"
+#ifdef WINDOWING_SDL3
 #include "window_sdl3.hpp"
+#endif
 #include "xbox_frame_profile.hpp"
 #include <os.hpp>
 #include <window.hpp>
@@ -15,22 +17,6 @@
 
 #undef min
 #undef max
-
-#ifndef VENC_MODE_WIDESCREEN
-#define VENC_MODE_WIDESCREEN VIDEO_WIDESCREEN
-#endif
-#ifndef VENC_MODE_720P
-#define VENC_MODE_720P VIDEO_MODE_720P
-#endif
-#ifndef VENC_MODE_1080I
-#define VENC_MODE_1080I VIDEO_MODE_1080I
-#endif
-#ifndef VENC_MODE_480P
-#define VENC_MODE_480P VIDEO_MODE_480P
-#endif
-#ifndef VENC_MODE_LETTERBOX
-#define VENC_MODE_LETTERBOX VIDEO_LETTERBOX
-#endif
 #endif
 
 #include <algorithm>
@@ -286,9 +272,9 @@ void Renderer_Xbox::initVideo() {
         case AV_PACK_HDTV:
             // Component (HDTV):
             // 720p and 1080i are digital/HDTV modes without CRT raster crop (0% overscan).
-            // Standard 480i through component may be on early HD CRTs with overscan (4%).
+            // Standard 480i through component may be on early HD CRTs with overscan (5%).
             if (xboxVideoSettings.width == 640 && xboxVideoSettings.height == 480 && !xboxVideoSettings.supports480p) {
-                autoOverscan = 0.04f;
+                autoOverscan = 0.05f;
             } else {
                 autoOverscan = 0.0f;
             }
@@ -300,9 +286,9 @@ void Renderer_Xbox::initVideo() {
         case AV_PACK_SCART:    // Advanced SCART (RGB)
         default:
             // Standard-definition analog CRT formats:
-            // Almost all consumer CRTs crop borders by ~3-5%. Apply 4% centered safe margin.
+            // Almost all consumer CRTs crop borders by ~3-5%. Apply 5% centered safe margin.
             if (xboxVideoSettings.width == 640 && xboxVideoSettings.height == 480) {
-                autoOverscan = 0.04f;
+                autoOverscan = 0.05f;
             } else {
                 autoOverscan = 0.0f;
             }
@@ -613,6 +599,7 @@ Renderer_Xbox::Renderer_Xbox() {
     int windowWidth = xboxVideoSettings.width;
     int windowHeight = xboxVideoSettings.height;
 
+#ifdef WINDOWING_SDL3
     window = createWindow(windowWidth, windowHeight, "Scratch Everywhere!", WindowingBackends::SDL3);
     if (window->error.has_value()) {
         error = "Failed to init window: " + window->error.value();
@@ -637,6 +624,9 @@ Renderer_Xbox::Renderer_Xbox() {
     applyVideoSettings();
 #ifdef SE_XBOX_TRACE_RENDERER
     traceStartupPixels(Sdlrenderer);
+#endif
+#else
+    error = "Renderer_Xbox requires SDL3 windowing backend (WINDOWING_SDL3)";
 #endif
 }
 
