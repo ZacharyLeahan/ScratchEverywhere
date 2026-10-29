@@ -264,6 +264,19 @@ and captures. Both guests exit cleanly with neutral controls. This refresh chang
 only the private emulator fixtures; physical installation, Appel v4 natural
 victory/replay, pacing/audio and every open hardware gate remain pending.
 
+## Spider Adventure full native playthrough — October 29
+
+The unchanged original project now completes all ten levels through normal
+emulated USB play on `807d1928...`: all 100 spiders, Score 14,110, Best combo 8,
+one life and authored YOU WIN. Life-loss recovery, Y victory replay to zero
+with retained high score, renewed movement/jumping, a fresh browser launch and
+repeated exits pass; cleanup leaves zero game sprites and all 21 browser entries.
+Full-source announcement, hurt, loss-mixture and win-mixture audio comparisons
+exceed 0.999 correlation in their bounded captures. See the
+[scoped gameplay/audio evidence](xbox-spider-adventure.md#native-emulator-full-run--october-29-2026).
+This closes the earlier short emulator run's ten-level gap, while physical
+victory, listening, pacing and all hardware qualification gates remain open.
+
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
 texture/pen behavior, and continue every open gate in the
