@@ -106,6 +106,16 @@ the browser. The latest binary retains **107/107** color-effect samples and
 PASSES=5 / ERRORS=0 / CYCLES=40. These are emulator checks; physical pen/collision
 acceptance and game-specific behavior still need testing.
 
+An ordinary native USB-controller [Breakout run](xbox-breakout-controller.md)
+now clears the final prepared archive at Score 1920 with three lives. Three
+captures contain no remaining brick colors, and the score stays fixed across
+960 additional video frames while the ball crosses the empty field. Natural
+Game Over, menu Green Flag replay to observed Score 0 / three lives / restored
+bricks, renewed steering and a separately verified fresh-launch browser exit
+also pass. These use the frozen sensing candidate and a read-only observer;
+physical full-board and normal-browser selection of that final archive remain
+open.
+
 The final post-theme XBE `f79fcd52...` also reaches the native launcher twice,
 once after the controller reboot. A 90-video-frame reset hold does not reboot;
 release cancels it, and a fresh full hold reaches `XReboot` after 122 frames.
