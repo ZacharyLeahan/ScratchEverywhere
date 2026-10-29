@@ -1,10 +1,11 @@
 # Upstream Xbox integration
 
 This branch merges upstream through
-[`1f6365b7`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/1f6365b71caeb38fc8cb4cf8f0e67ae7f1fbecfe),
+[`ec2400eb`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/ec2400ebca42b7060795ff2c3d426c63a0c89687),
 including [PR 816](https://github.com/ScratchEverywhere/ScratchEverywhere/pull/816):
 the native NV2A renderer/window, dedicated Xbox audio, and runtime/memory improvements.
-It is a candidate for the fork; hardware qualification is still pending.
+The subsequent Halloween menu assets are included too. It is a candidate for
+the fork; hardware qualification is still pending.
 
 ## Fork behavior retained
 
@@ -43,7 +44,12 @@ with the release archive checked against GitHub's asset SHA-256. GDB confirms
 NV2A renderer/window IDs 3/0; all four emulated USB controller ports move the
 launcher selection. Catch Apples launches, Back opens the console menu, and
 Return to game list completes without launching another project. These are
-emulator checks, not physical Xbox acceptance or an all-games pass.
+emulator checks, not physical Xbox acceptance or an all-games pass. A separately
+verified Catch run steers both ways with the left stick, reaches Score 12 /
+Timer 0, restarts on short Start at Score 0 / Timer 29, and returns to the browser.
+The earlier incorrectly selected Breakout run is retained separately and does
+not supply this Catch evidence. Game Over text has visible edge artifacts;
+rendering quality and audio remain open checks.
 
 The installed stock Mac xemu cannot provide Vulkan and falls back to OpenGL.
 Its earlier startup used the legacy Xbox renderer (IDs 4/1), so it does not count
