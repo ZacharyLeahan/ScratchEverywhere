@@ -1,5 +1,9 @@
 # Xbox game hardware qualification
 
+For a short current summary of hardware versus emulator results, measured
+performance and known issues, see [Xbox game status](xbox-game-status.md).
+This checklist retains the detailed physical acceptance gates.
+
 The goal is all twenty-one installed games thoroughly tested on the physical
 Xbox, with fixes until each works. Downloads, successful builds, and a title
 screen are not full passes.

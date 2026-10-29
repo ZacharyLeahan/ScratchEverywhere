@@ -1,11 +1,12 @@
 # Upstream Xbox integration
 
-This branch merges upstream through
+This work integrates upstream through
 [`ec2400eb`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/ec2400ebca42b7060795ff2c3d426c63a0c89687),
 including [PR 816](https://github.com/ScratchEverywhere/ScratchEverywhere/pull/816):
 the native NV2A renderer/window, dedicated Xbox audio, and runtime/memory improvements.
-The subsequent Halloween menu assets are included too. It is a candidate for
-the fork; hardware qualification is still pending.
+The subsequent Halloween menu assets are included too. Source integration in
+the fork is separate from deployment; native hardware qualification is still pending.
+See the [current game status and known issues](xbox-game-status.md).
 
 ## Fork behavior retained
 
@@ -392,7 +393,7 @@ open issue; settled-Win silence adds no active-play audio acceptance.
 See [the same-round evidence, host corrections and exact limits](xbox-pacman.md#native-emulator-full-board--october-29-2026).
 Physical full-board/ghost, pacing and 64 MB gates remain open.
 
-Before merging: verify the native backend and the intended saved renderer choice
+Hardware follow-up: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
 texture/pen behavior, and continue every open gate in the
 [21-game qualification matrix](xbox-game-qualification.md).
