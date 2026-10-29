@@ -64,6 +64,15 @@ class SE_EXPORT Image {
   private:
 #ifdef ENABLE_SVG
     std::unique_ptr<lunasvg::Document> svgDocument = nullptr;
+#ifdef __XBOX__
+    // Keep the source location, rather than every parsed SVG tree, for growth.
+    std::string svgSourcePath;
+    ZipArchive *svgSourceZip = nullptr;
+    bool svgSourceArchived = false;
+    bool svgSourceFromProject = false;
+    float svgRequestedScale = 0.0f;
+    bool svgUploadPending = false;
+#endif
     static std::unordered_map<std::string, SVGFont> loadedFonts;
 #endif
 

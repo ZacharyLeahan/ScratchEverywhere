@@ -140,6 +140,33 @@ primary checkout. No physical XBE, game archive, controller firmware, or KVM
 settings were changed by this integration. The separate frozen Sokoban replay
 continues against its original binary and full-set prepared archive.
 
+## Appel SVG growth and complete-project checks
+
+Appel's animated menu exposed a separate Xbox image-cache defect: AUDIO ON and
+EDITOR were first rasterized at 20x5 pixels (scale 0.133), then stretched after
+the animation reached full size. Xbox frees parsed SVG trees after rasterizing,
+so the existing resize path silently skipped growth. Images now retain their
+source location and reload the original SVG when a larger raster is requested.
+Parsed trees are still released; temporary decode failures retain the previous
+pixels/geometry, and failed texture uploads remain retryable.
+
+The complete controller-menu v3 archive (`117188ba...`) retains all 460 original
+assets, including 45 audio files. Native candidate `0f04b4ec...` displays readable
+title and level-picker labels; the corresponding cached buttons are 216x57,
+with no retained SVG document. Actual emulated USB inputs enter Level One, move
+both ways, jump, collect four apples and activate the first checkpoint. A spike
+collision shows the authored death particles and respawns at that checkpoint;
+read-only observation confirms PLAY, four apples and a nonzero spawn index.
+Green Flag from the console menu returns to the readable title; a subsequent
+Back / Return to game list redraws the populated browser.
+
+A ten-second APU capture has no clipped samples or fully silent 256-sample
+blocks. Aligning it with the original music asset gives 0.999990 correlation.
+This checks emulated output, not physical TV sound, all game sounds or performance.
+The NXDK build and existing costume-cache, cache-lifetime, Scratch 2 text and
+real SVG bounds/pixels checks pass. Thin terrain seams, a full Level One clear,
+physical smoothness and the remaining game/hardware gates are still open.
+
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
 texture/pen behavior, and continue every open gate in the

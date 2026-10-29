@@ -530,6 +530,47 @@ nonstd::expected<void, std::string> Image::resizeSVG(float scale) {
     if constexpr (maxScale != 0)
         if (scale > maxScale) scale = maxScale;
 
+#ifdef __XBOX__
+    if (svgUploadPending) {
+        auto refreshed = refreshTexture();
+        if (!refreshed.has_value()) return refreshed;
+        svgUploadPending = false;
+    }
+    if (!isSVGImage || scale <= svgRequestedScale) return {};
+    if (!svgDocument && !svgSourcePath.empty()) {
+        // Xbox releases the parsed tree after rasterizing. Re-read the asset
+        // when an animated or shared costume outgrows its first small image.
+        // Do not discard the usable pixels/geometry on a temporary load failure.
+        const ImageData saved = imgData;
+        const auto savedOffset = svgViewOffset;
+        const float savedRequest = svgRequestedScale;
+        imgData.pixels = nullptr;
+        auto loaded = svgSourceArchived
+            ? init(svgSourcePath, svgSourceZip, false, scale)
+            : init(svgSourcePath, svgSourceFromProject, false, scale);
+        if (!loaded.has_value()) {
+            freePixels();
+            imgData = saved;
+            svgViewOffset = savedOffset;
+            svgRequestedScale = savedRequest;
+            return nonstd::make_unexpected(loaded.error());
+        }
+        if (imgData.width <= saved.width && imgData.height <= saved.height) {
+            freePixels();
+            imgData = saved;
+            svgViewOffset = savedOffset;
+            return {};
+        }
+        alphaMask.clear();
+        alphaMaskPitch = 0;
+        isOpaque = false;
+        auto refreshed = refreshTexture();
+        free(saved.pixels);
+        // A failed upload must be retried even when the next size is unchanged.
+        svgUploadPending = !refreshed.has_value();
+        return refreshed;
+    }
+#endif
     if (!svgDocument || scale <= imgData.scale) return {};
     if (svgDocument->width() <= 0.0f || svgDocument->height() <= 0.0f) return {};
 
@@ -722,6 +763,15 @@ Image::Image(std::string filePath, ZipArchive *zip, bool bitmapHalfQuality, floa
 }
 
 nonstd::expected<void, std::string> Image::init(std::string filePath, bool fromScratchProject, bool bitmapHalfQuality, float scale) {
+#if defined(__XBOX__) && defined(ENABLE_SVG)
+    if (hasSVGExtension(filePath)) {
+        svgSourcePath = filePath;
+        svgSourceZip = nullptr;
+        svgSourceArchived = false;
+        svgSourceFromProject = fromScratchProject;
+        svgRequestedScale = maxScale ? std::min(scale, static_cast<float>(maxScale)) : scale;
+    }
+#endif
     const auto layers = fromScratchProject && Unzip::currentFormat == ProjectFormat::SB2
         ? Sb2BitmapLayers::split(filePath) : std::nullopt;
     if (layers) filePath = layers->first;
@@ -768,6 +818,15 @@ nonstd::expected<void, std::string> Image::init(std::string filePath, bool fromS
 }
 
 nonstd::expected<void, std::string> Image::init(std::string filePath, ZipArchive *zip, bool bitmapHalfQuality, float scale) {
+#if defined(__XBOX__) && defined(ENABLE_SVG)
+    if (hasSVGExtension(filePath)) {
+        svgSourcePath = filePath;
+        svgSourceZip = zip;
+        svgSourceArchived = true;
+        svgSourceFromProject = true;
+        svgRequestedScale = maxScale ? std::min(scale, static_cast<float>(maxScale)) : scale;
+    }
+#endif
     const auto layers = Unzip::currentFormat == ProjectFormat::SB2 ? Sb2BitmapLayers::split(filePath) : std::nullopt;
     if (layers) filePath = layers->first;
     void *raw_data = nullptr;
