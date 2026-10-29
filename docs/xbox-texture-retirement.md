@@ -59,7 +59,13 @@ the explicit level-eight fixture. Twenty Black/R restart commands and all
 pixels differed by more than 35 in any RGB channel from the initial JPEG.
 That tolerance accommodates capture noise; the xemu checks above are exact.
 Pause and Return to game list also returned to the populated browser.
-This is targeted rendering evidence, not full game, audio, or 64MB acceptance.
+The standalone diagnostic then retained an unchanged board across another
+21 captures (155,520 board pixels each), but its HUD advanced from DRAWS 1
+to 20 after twenty commands. Capture 10 repeated the previous counter value.
+The original visual-only oracle passed; manual review of every HUD crop keeps
+the controller-delivery gate open. A missed input versus delayed capture has
+not been isolated. This is targeted rendering evidence, not full game, audio,
+controller-delivery, or 64MB acceptance.
 
 Raw matching binaries, source/build receipts, native images and controller/video
 records are retained locally under ignored `build-xbox/sokoban-texture-lifetime-20261028`,
