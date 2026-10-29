@@ -591,7 +591,14 @@ bool Render::checkFramerate() {
 
 std::string Render::getVariableValueString(Value value) {
     if (value.isDouble()) {
-        return Math::toString(std::round(value.get<double>() * 1e6) / 1e6); // js Number(value.toFixed(6))
+        const double number = value.get<double>();
+        // Above 2^33, double spacing exceeds a millionth. Rounding cannot
+        // change the result, and scaling very large values can overflow.
+        if (std::abs(number) >= 0x1p33) return Math::toString(number);
+        // Fast-math otherwise multiplies by an inexact reciprocal, exposing
+        // tails such as 0.19999999999999998 after rounding the monitor to 0.2.
+        volatile double decimalScale = 1e6;
+        return Math::toString(std::round(number * 1e6) / decimalScale);
     } else if (value.isUndefined()) {
         return ""; // Scratch keeps the original value, leave blank for now
     } else {
