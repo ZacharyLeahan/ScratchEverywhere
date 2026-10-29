@@ -110,3 +110,14 @@ loop check uses the same unchanged music asset.
 
 Local preparation, solver, archive-comparison and runtime evidence is in ignored
 `build-xbox/hardware/sokoban-*` and `build-xbox/xemu-sokoban-level10/`.
+
+## Texture reuse during redraws (October 28, 2026)
+
+A separate runtime defect could leave partial or missing board stamps while
+Sokoban's map and submitted geometry were correct. The [Xbox texture-retirement
+fix](xbox-texture-retirement.md) waits for submitted GPU reads before freeing
+costume storage. The normal candidate passed 100 exact-pixel level-eight
+redraws in xemu and twenty controller restart commands with 21 clean settled
+board captures on the physical 128MB Xbox, followed by a clean browser return.
+These use an explicitly selected level-eight fixture; complete normal
+playthrough and the full-set prepared-copy hardware gate remain open.

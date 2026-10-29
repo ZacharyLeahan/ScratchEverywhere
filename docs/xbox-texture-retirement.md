@@ -1,0 +1,68 @@
+# Xbox texture retirement
+
+Rapid costume changes could leave missing or partial pen stamps. Sokoban's
+logical map and submitted geometry were correct even when its board was not.
+SDL flushes queued drawing before destroying a texture, but the nxdk renderer
+freed the texture's contiguous memory while submitted GPU commands could still
+read it. The allocator could reuse that memory for the next costume.
+
+The Xbox SDL patch now waits for `pb_busy()` to clear before freeing texture
+storage, using the same completion check as the driver's present/readback paths.
+This is an Xbox driver change; project scripts and shared Scratch execution
+are unchanged. It can wait for unrelated pending GPU work too. Performance
+across costume-heavy games still needs checking; no FPS improvement is claimed.
+
+The Xbox SDL recipe also includes the local patch hash in its source-cache
+path. Catalog otherwise reuses a repository/ref checkout after a patch edit,
+which can silently leave the compiled driver unchanged. Patch edits now also
+trigger CMake reconfiguration. A fresh normal build was inspected to verify
+that it compiled the guarded free, without private tracing.
+
+## Small reproduction
+
+Generate the standalone diagnostic using Python 3's standard library:
+
+```sh
+python3 examples/make-xbox-texture-lifetime-test.py /tmp/texture-retirement.sb2
+```
+
+Load it like any other project. Expect 48 colored, black-bordered tiles in an
+8-by-6 board. Press the Scratch R or A key to redraw; DRAWS increments each time.
+On Xbox, map a controller button to `r` in the project's controls sidecar. The
+board must remain unchanged. The generator refuses an existing output file
+and produces byte-identical archives on repeated runs. It is a diagnostic,
+not one of the twenty-one qualification games.
+
+## Validation on October 28, 2026
+
+| Check | Unmodified control | Fixed normal build |
+| --- | --- | --- |
+| Standalone diagnostic in 128MB xemu | Redraw 4 lost a tile; 3,306 board pixels differed | 100 draws; all 116,624 compared board pixels unchanged; 48 tile centers correct |
+| Delayed level-eight Sokoban fixture in xemu | Repeated redraws reproduced partial/missing stamps | 100 captured redraws; all 174,936 compared board pixels unchanged |
+| Existing native color/pen regression | Previously established 38 passes | 38 passes, zero errors |
+
+The debugger supplied ordinary R inputs only and restored its borrowed input
+vector afterwards. It did not write project maps, positions, scores, or state.
+These deliberately selected fixtures do not establish a full Sokoban playthrough.
+A metadata-only lifetime control observed 207 frees with pending GPU work and
+193 same-frame reallocations after such frees. The paired diagnostic fix
+waited in 1,245 busy-at-entry release cases and passed 100 Sokoban redraws.
+`pb_busy()` describes GPU work generally, not which exact texture it uses.
+
+The production candidate XBE is SHA-256
+`78cb682a2546e6411086bcdcb28ad6764d91525c28199f7ad58598759274ccc8`.
+A separate physical test app was installed with full temporary/final FTP
+readbacks. The primary Games launcher remains `b75e9beb...`.
+The 128MB Xbox launched the candidate through its normal browser and displayed
+the explicit level-eight fixture. Twenty Black/R restart commands and all
+21 settled board captures showed no corruption: none of 232,518 compared board
+pixels differed by more than 35 in any RGB channel from the initial JPEG.
+That tolerance accommodates capture noise; the xemu checks above are exact.
+Pause and Return to game list also returned to the populated browser.
+This is targeted rendering evidence, not full game, audio, or 64MB acceptance.
+
+Raw matching binaries, source/build receipts, native images and controller/video
+records are retained locally under ignored `build-xbox/sokoban-texture-lifetime-20261028`,
+`build-xbox/texture-lifetime-fixture-20261028`,
+`build-xbox/texture-retirement-color-regression-20261028` and
+`build-xbox/hardware/texture-retirement-20261028`.

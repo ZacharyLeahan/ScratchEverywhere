@@ -51,6 +51,16 @@ qualification notes for the original/prepared hashes and preserved assets.
 The current browser's first page shows 2048, Appel, Asteroids, Atari Breakout
 and Catch Apples.
 
+## Texture-retirement candidate (October 28, 2026)
+
+The separate normal candidate `78cb682a...` includes an Xbox SDL texture
+lifetime repair. [Reproduction and evidence](xbox-texture-retirement.md) cover
+a standalone control/fix comparison, 100 exact-pixel Sokoban redraws, the
+38-case native color/pen regression, and twenty physical controller restart
+commands with 21 clean settled board captures and return to the game list.
+The primary Games launcher remains `b75e9beb...`. These selected diagnostic
+projects do not qualify any complete game or close the all-twenty-one goal.
+
 ## Installed normal dashboard launcher — October 27, 2026
 
 The existing dashboard entry now launches normal diagnostics-off XBE SHA-256
