@@ -89,3 +89,31 @@ collected fruit after Green Flag replay and later showed Score 125. Its planned
 self-collision did not reach the tail, and controller connectivity subsequently
 became unavailable across all four adapters. These are limited compatibility
 observations; see the [input-delivery evidence](xbox-kvm-input-delivery.md).
+
+
+## Full thirteen-puzzle replay (October 29, 2026)
+
+The same normal `78cb682a...` build completed the separate full-set prepared
+candidate `8253ed9a...` from an ordinary level-one start: 2,728 moves and
+628 pushes, all thirteen puzzle completions, and the natural wrap back to
+level one. No level selector or project-state writes were used. The debugger
+supplied ordinary direction keys before native hat dispatch and restored its
+borrowed input vector afterwards.
+
+An independent audit rechecked every recorded player position and map cell
+against the saved routes and counted all 628 pushes from actual crate-cell
+changes. All 796 initial-board cell-center samples matched, and all thirteen
+initial images were visually reviewed. The wrapped level-one playfield matched
+its initial image exactly across 197,574 pixels, excluding the HUD. The earlier
+whole-board level-ten reference comparison also remained exact. This is not a
+claim of thirteen full-image pixel comparisons.
+
+This full-set archive is the candidate from
+[PR 34](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/34), not the
+older level-ten-only repair installed on the Xbox. The result establishes the
+normal SDL rendering fix's emulator compatibility across the complete set.
+It does not close physical full-set/controller, audio, FPS, 64MB, or native NV2A
+qualification. The roughly 2.55-hour run includes debugger overhead and is not
+an ordinary-play performance measurement. Original images, complete move
+history, restored-input check and `completion-audit.json` are retained under
+ignored `build-xbox/sokoban-texture-fullset-20261028/`.

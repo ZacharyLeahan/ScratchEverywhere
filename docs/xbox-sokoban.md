@@ -119,5 +119,23 @@ fix](xbox-texture-retirement.md) waits for submitted GPU reads before freeing
 costume storage. The normal candidate passed 100 exact-pixel level-eight
 redraws in xemu and twenty controller restart commands with 21 clean settled
 board captures on the physical 128MB Xbox, followed by a clean browser return.
-These use an explicitly selected level-eight fixture; complete normal
-playthrough and the full-set prepared-copy hardware gate remain open.
+Those selected fixtures alone do not establish a complete playthrough. The
+full-set prepared-copy hardware gate remains open; the later emulator replay
+is described below.
+
+
+## Full-set emulator follow-up (October 29, 2026)
+
+The separate `8253ed9a...` full-set candidate from
+[PR 34](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/34) now
+passes an ordinary level-one start through all thirteen puzzles and natural
+wrap to level one on the normal texture-retirement build `78cb682a...`.
+All 2,728 moves and 628 pushes were checked against independent expected
+player/map states. All thirteen initial boards passed 796 cell-center samples
+and visual review; the wrapped level-one playfield was pixel-identical across
+197,574 pixels, excluding its updated move counter. Inputs were restored.
+See the [rendering-fix validation](xbox-texture-retirement.md).
+
+The physical Xbox still has the earlier `efdbc005...` level-ten-only repair.
+This emulator result neither changes that installation nor proves controller
+transport, audio, FPS, all-thirteen full-image pixel equality, or 64MB support.
