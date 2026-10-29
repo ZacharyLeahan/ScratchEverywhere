@@ -189,6 +189,21 @@ CYCLES=40. The upload helper passes 27 shape/format combinations with ASan/UBSan
 including row pitches, one-dimensional images, repeated updates and guards.
 Hardware artwork and performance qualification remain pending.
 
+## Appel extended native playthrough — October 29
+
+The same `807d1928...` executable and complete controller-menu archive
+`117188ba...` repeat both moving lifts and the roof, collect hidden-passage
+apples, and clear the spike tower onto the next roof. A running takeoff near
+world X=2826 reaches X=3186 / Y=317.01 on that roof. These are ordinary emulated
+USB controller actions, timed with read-only position observations; no game
+variables, collision rules, assets or input polling were changed.
+
+The following enemy approach collects apple fourteen and ends in a natural
+death. Respawn retains 14/35 at checkpoint two: PLAY, X=2190, Y=197.01,
+SPAWN IDX=421, with the death flag cleared. The third checkpoint, Level One
+victory and victory replay remain open. This is emulator gameplay evidence;
+it does not qualify physical Xbox pacing, audio or controller delivery.
+
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
 texture/pen behavior, and continue every open gate in the
