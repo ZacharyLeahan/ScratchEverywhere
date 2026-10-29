@@ -220,10 +220,21 @@ change reverted.** It was neither merged nor installed on the Xbox. The short
 reproduction makes further investigation possible without another multi-hour
 playthrough; the actual rendering fix remains open.
 
+A separate **unmodified current-main control** also reproduced partial tile
+corruption on its third captured restart: all 72 tile centers matched, but
+619 board pixels differed. This confirms that the defect is still relevant to
+current main, and reinforces the need for complete-image comparison. The
+control and experimental guests were closed after restoring native input;
+one earlier failing guest is retained paused for further inspection.
+
 These are private emulator findings, not physical controller, performance or
 audio acceptance. Original images, logical states, direct pen-surface bytes,
 compiled Xbox structure-layout offsets and input-restoration receipts are in
 ignored `build-xbox/sokoban-visual-repeat-20261028/` in the primary checkout.
+The short fixture and full-image comparisons are under
+`build-xbox/sokoban-level8-restarts-20261028/`; the rejected experiment and
+current-main control are under `build-xbox/sokoban-cache-candidate-20261028/`
+and `build-xbox/sokoban-current-main-control-20261028/` respectively.
 The physical Xbox's installed archive and executable were not changed.
 
 **This candidate has not been installed or tested on the physical Xbox.** The
