@@ -205,9 +205,8 @@ were used; read-only position observations helped time takeoffs.
 Controller mouse mode (White + D-pad, then White + RT) activates the authored
 **Try Again** button. The fresh round shows 0/35 and 0:00.0; Right/A restore
 walking and jumping, and read-only inspection confirms PLAY with no checkpoint.
-Back / Return to game list redraws the populated browser. Direct D-pad/A focus
-on the victory menu is still missing from the prepared project; its title and
-level-picker navigation are separate.
+Back / Return to game list redraws the populated browser. That v3 copy requires mouse mode
+for the victory menu; its title and level-picker already support D-pad/A.
 
 The 3.883-second emulated APU capture across completion contains no clipped
 samples or zero 256-sample blocks. The full original completion cue matches
@@ -217,6 +216,30 @@ but that private HDD fixture lacks the controller-menu variables and is excluded
 from prepared-copy relaunch acceptance. Refresh that fixture before repeating
 prepared-copy browser launch. Physical Level One/replay, pacing, audio and the
 other hardware qualification gates remain open.
+
+## Appel victory controller menus
+
+The project preparer now adds victory focus for Continue, Try Again, Level Select
+and Replay. Up/down cycle the choices; left/right cross the bottom row. A runs
+the selected button's original `show menu` procedure on release. Moving focus
+while holding A cancels the old selection. White reserves pointer control,
+because native input sends arrow events during White + D-pad mouse movement.
+This is an Appel preparation change; no C++ runtime changes are needed.
+
+Compared with v3, the normal v4 archive `6ccd3f17...` preserves all 460 asset
+files, including 45 sound files, every stage gameplay script and all other targets. Focus/hover
+routing changes only the in-game menu and adds one stage focus variable; its
+authored actions remain intact. Host checks cover preservation, navigation,
+release/recheck guards, single-clone activation and pointer isolation.
+
+On native `807d1928...`, a separate full-project **diagnostic fixture** opens the
+victory menu from PLAY. It verifies all four focus choices, wrap and bottom-row
+navigation, pointer fallback, cancellation, A hold/release, real Try Again reset
+and renewed jumping, Level Select, Continue to the next level, Replay activation
+and launcher return. It seeds WIN for this bounded menu test and does not prove
+a natural v4 victory or complete recorded-run playback. The earlier 21-apple
+natural victory belongs to the unchanged v3 archive. Normal v4 deployment and
+physical controller/menu acceptance remain pending.
 
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
