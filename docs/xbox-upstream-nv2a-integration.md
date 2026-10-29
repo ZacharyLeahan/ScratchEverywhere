@@ -367,6 +367,19 @@ reset chord reaches `XReboot` and fresh application startup. A slow render can
 still delay pause; physical recovery and performance are not established.
 See [the reproduction, delayed third result and validation scope](xbox-native-back-taps.md).
 
+## Space Invaders native full wave — October 29
+
+The original `09e3816b...` project clears all 55 invaders on native `4ef49719...`
+through ordinary emulated USB play, with every remaining count down to zero
+observed and a fresh 55 appearing at Score 990/all three lives. Wave two
+continues to 1,370 with normal life-loss recovery. Green Flag, renewed controls,
+a fresh browser launch and two held Exits pass; cleanup leaves zero sprites
+and all 21 games/42 buttons. Selected whole-source audio matches come from an
+uninterrupted 20.037-second unclipped APU capture; other cues and continuity
+are not accepted. No runtime or game changes were needed in this batch.
+See [the full-wave proof, failed host strategies and exact scope](xbox-space-invaders.md#native-emulator-full-wave--october-29-2026).
+Physical full-wave/audio, pacing and 64 MB gates remain open.
+
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
 texture/pen behavior, and continue every open gate in the

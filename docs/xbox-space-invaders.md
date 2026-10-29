@@ -34,3 +34,47 @@ and the guided-run frame folders retain original JPEGs and executed helpers;
 `catch-scoring-deploy-20261028/receipt.json` contains the subsequent full
 readbacks; its saved `debug.txt` records Space Invaders loading and cleanup.
 No Space Invaders scripts or runtime behavior changed for these tests.
+
+## Native emulator full wave — October 29, 2026
+
+The unchanged original archive `09e3816b...` now clears a complete wave on
+native `4ef49719...`, renderer/window 3/0, in private 128 MB Vulkan xemu.
+Normal browser selection and actual emulated USB Left/Right/A play produce
+**55 → 0 → a fresh 55 invaders, Score 990, all three lives**. Every remaining
+count from 55 through zero is observed; score never resets and Game Over
+stays false. The wave initializer's `drops to land` changes from 9 to 8.
+A settled capture independently shows all 55 new invaders and the retained
+990/three-life HUD. This is a wave transition, not a score-only inference.
+
+Read-only state guides the host controller helper. It clears the leftmost
+column before moving on, then times shots from a fixed lane. Three earlier
+normal losses at 940/two remaining, 850/seven and 920/three are retained.
+They exposed host aiming mistakes: switching columns left distant edge aliens
+alive, and the final three moved once per roughly two bullet updates rather
+than the helper's assumed one. Only host planning changed. Original scripts/assets are untouched; no gameplay
+state or RNG writes, physics edits, input-poll bypasses or mid-round restarts
+are used.
+The winning round starts with a normal A replay from loss at zero/55/three.
+
+An uninterrupted 1,200-video-frame follow-up advances wave two to Score 1,370,
+31 invaders and two lives, with the base normally respawned and no Game Over.
+Its 20.037-second APU recording is unclipped. Whole-source correlations are
+0.999845/0.999746 for movement effects one/four and 0.982523 for shooting,
+without pitch or time warping. Overlapping/unheard cues and silent blocks are
+not individually qualified; this is not complete continuity or TV listening
+acceptance.
+
+Green Flag returns to the title at zero; A starts a new 55-alien/three-life
+round, with Right/Left/fire working again. Two held-confirmation Exits return
+to all 21 projects/42 buttons with zero game sprites. Between them, a fresh
+browser selection loads the actual Space Invaders archive, starts another
+normal round and accepts Right/fire. Observer addresses are refreshed after
+reload rather than reading the previous project's freed objects.
+
+Ignored evidence is under `build-xbox/space-native-fullwave-20261029/`:
+`review.json`, `fullwave-audit.json`, the four original attempt logs/captures,
+`wave2-confirmed.png`, `wave2-audio{,-match}.json` and `project-regressions.json`.
+The guest closes cleanly and the shared HDD, game and control profile remain
+unchanged. No executable or project is installed on the physical console in
+this batch. Hardware full-wave, subjective/long-run audio, pacing and retail
+64 MB qualification remain open.
