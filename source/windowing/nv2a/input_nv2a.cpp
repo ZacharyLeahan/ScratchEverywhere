@@ -82,11 +82,12 @@ static void ensureUsbStack() {
     for (auto dev = usbh_xid_get_device_list(); dev; dev = dev->next) on_xid_connection(dev, 0);
 }
 
-static bool copyActiveReport(XboxNativeInput::Report &report) {
+static bool copyActiveReport(XboxNativeInput::Report &report, bool &backPressed) {
     // NXDK completes transfers in an OHCI DPC. Match SDL's short DPC-level
     // snapshot instead of copying a report while its bytes are being replaced.
     const KIRQL previous = KeRaiseIrqlToDpcLevel();
     const bool valid = s_controllers.copyActive(report);
+    backPressed = s_controllers.consumeBackPress();
     KfLowerIrql(previous);
     return valid;
 }
@@ -145,7 +146,8 @@ void InputDevice_NV2A::getInput() {
 #ifdef __XBOX__
     pollControllers();
     XboxNativeInput::Report report;
-    if (copyActiveReport(report)) {
+    bool backPressed = false;
+    if (copyActiveReport(report, backPressed)) {
         uint16_t dButtons = uint16_t(report[2]) | (uint16_t(report[3]) << 8);
         uint8_t btnA = report[4];
         uint8_t btnB = report[5];
@@ -180,7 +182,7 @@ void InputDevice_NV2A::getInput() {
 
         // Start & Back
         if (dButtons & (1 << 4)) Input::buttonPress("start");
-        if (dButtons & (1 << 5)) Input::inputButtons.push_back("back");
+        if (backPressed || (dButtons & (1 << 5))) Input::inputButtons.push_back("back");
 
         // Thumb clicks
         if (dButtons & (1 << 6)) Input::buttonPress("LeftStickPressed");

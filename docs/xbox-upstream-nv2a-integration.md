@@ -342,8 +342,9 @@ gameplay qualification.
 Mario's first short Back press during the Will_Wam intro does **not** open pause.
 After another 600 neutral video frames, its controls scene appears; the same
 short Back press then opens pause and Exit succeeds. The missed early press is
-retained as an open startup/input timing check, not dismissed as a crash or
-counted as uniform first-attempt pause success. The helper's earlier loading-flag
+retained in the original results, not dismissed as a crash or counted as
+uniform first-attempt pause success. The Back-tap fix below addresses the lost
+input; frame-pacing acceptance remains separate. The helper's earlier loading-flag
 and empty-string observation errors are also retained; neither required an
 engine or project change.
 
@@ -352,6 +353,19 @@ selected/loaded/pause/returned receipts and screenshots, and the QMP logs.
 The guest exits cleanly; all 41 normal source files and the saved shared HDD
 remain byte-identical. Physical controls/handoff, full gameplay, audio, pacing
 and retail 64 MB acceptance remain open.
+
+## Native Back-tap retention — October 29
+
+Read-only USB/poll tracing localizes Mario's startup miss: a complete Back tap
+arrives between game input polls and is replaced by neutral before the next
+poll. Candidate `4ef49719...` retains only reserved Back edges until the existing
+atomic input snapshot consumes them. Gameplay/confirmation state and reset
+hold timing remain live and unchanged. ASan/UBSan controller checks and the
+NXDK debug-symbol build pass. Actual USB-path comparisons accept the tap after
+release, repeated menu toggles and held Exit/fresh-game checks pass, and the
+reset chord reaches `XReboot` and fresh application startup. A slow render can
+still delay pause; physical recovery and performance are not established.
+See [the reproduction, delayed third result and validation scope](xbox-native-back-taps.md).
 
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and

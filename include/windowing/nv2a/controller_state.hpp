@@ -31,7 +31,7 @@ class Controllers {
     struct Pad {
         Report report{};
         uint32_t activity = 0, resetSince = 0;
-        bool connected = false, valid = false, resetting = false;
+        bool connected = false, valid = false, resetting = false, backPressed = false;
     };
     std::array<Pad, 4> pads{};
     int active = -1;
@@ -46,6 +46,7 @@ class Controllers {
         if (index >= pads.size()) return;
         pads[index].valid = pads[index].resetting = false;
         pads[index].activity = 0;
+        pads[index].backPressed = false;
         pads[index].report = Report{};
         if (active == int(index)) active = -1;
     }
@@ -60,6 +61,9 @@ class Controllers {
             return false;
         }
         auto &pad = pads[index];
+        // Back is reserved for the console menu. Retain its rising edge when a
+        // slow game frame spans an entire tap; gameplay stays a live snapshot.
+        if ((bytes[2] & 0x20) && !(pad.report[2] & 0x20)) pad.backPressed = true;
         for (size_t i = 0; i < pad.report.size(); ++i) pad.report[i] = bytes[i];
         const uint32_t next = activity(pad.report);
         // Held or neutral reports from another pad must not steal control back.
@@ -80,6 +84,14 @@ class Controllers {
         const int index = activeIndex();
         report = index < 0 ? Report{} : pads[index].report;
         return index >= 0;
+    }
+    bool consumeBackPress() {
+        bool pressed = false;
+        for (auto &pad : pads) {
+            pressed |= pad.connected && pad.valid && pad.backPressed;
+            pad.backPressed = false;
+        }
+        return pressed;
     }
     bool resetRequested(uint32_t now) const {
         for (const auto &pad : pads)
