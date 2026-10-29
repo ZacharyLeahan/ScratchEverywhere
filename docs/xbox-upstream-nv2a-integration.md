@@ -312,6 +312,22 @@ the linked original screenshots/QMP receipts, and `browser-live-list.json`.
 Physical v4 deployment/victory/replay, TV movement acceptance, pacing, audio,
 lwmem and 64 MB support remain open. Emulator frame budgets are not FPS results.
 
+## Frogger native full round — October 29
+
+The unchanged normal prepared Frogger archive `6c747a92...` reaches all seven
+pads in one unseeded round through actual emulated USB controls on native
+`807d1928...`. The authored You Win display appears; Green Flag clears the
+pads/score, all four directions work, and a later traffic death shows only
+Game Over. Fresh browser launch and two exits pass, each leaving zero game
+sprites and all 21 projects/42 buttons. The guest closes cleanly with the saved
+HDD unchanged. No engine or project changes were needed.
+
+The final point leaves internal `alive=0`, which initially stops the helper's
+strict check; the actual victory and replay still pass. The authored ending
+suppresses loss UI/sound at score seven. See the [full-round evidence and
+caveat](xbox-frogger.md#native-emulator-full-round--october-29-2026).
+Physical seven-pad victory/replay, audio, pacing and 64 MB gates remain open.
+
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
 texture/pen behavior, and continue every open gate in the
