@@ -95,3 +95,41 @@ Ignored evidence: `build-xbox/hardware/snake-clock-physical-audit-20261028.json`
 `snake-grid-long-audio-20261028.{wav,json}` with
 `snake-ending-audio-match-20261028.json`. The installed original archive and
 normal executable passed full FTP readbacks after this batch.
+
+## Blade, clock restoration and tail collision — October 29, 2026
+
+The existing normal SDL texture-retirement build `78cb682a…` passed three
+additional checks on the physical 128 MB Xbox with the unchanged archive and
+profile. Input came through Player One; observations used HDMI only.
+
+- **Blade:** the head entered the visible blade cell, the blade disappeared,
+  one body segment was removed, and steering continued.
+- **Clock:** an ordinary pickup slowed movement, then normal speed returned
+  during uninterrupted play. Median observed one-cell intervals were 0.155 s
+  before, 0.287 s while slowed, and 0.150 s afterward (22, 12 and 16 samples).
+  Original JPEG hashes match the frame receipt timestamps. The return occurs
+  approximately four active seconds after pickup, consistent with the authored
+  timer. These receive-time measurements are not exact simulation timing or FPS.
+- **Tail collision:** the snake reached a visible U-shaped enclosure near the
+  center of the board, with its next downward cell occupied by its own tail.
+  After a runtime pause, B alone resumed movement and Game Over appeared at
+  **Score 225**. This identifies self-collision from the visible position,
+  occupied next cell and immediate ending far from a boundary; the recording
+  jumps from the menu to the ending and does not contain an individual contact
+  frame. The downloaded Highscore 2000 remains unrelated to these test scores.
+
+A short confirmation returned to the populated browser. A fresh browser launch
+and Green Flag replay restored the short snake and renewed Up/Left steering.
+The second Exit was not accepted: the confirmation missed, and its retry found
+all four KVM controller adapters stale. Earlier failed observer tracking,
+short-tail loops and a separate boundary loss at 125 are retained and excluded
+from the self-collision result. The adapters required two physical reconnects;
+no firmware, network settings, game archive or executable changed.
+
+Subjective listening and extended active-game audio remain open. This batch
+qualifies the legacy renderer build, not the draft native NV2A candidate.
+Evidence: ignored `build-xbox/hardware/snake-reconnected-20261029/review.json`,
+`clock-raw-cadence-audit.json`, the `blade-video`, `restored2-video`,
+`tail-contact-video` and `fresh-replay-video` original frames/receipts, and the
+linked controller traces. The initial contact-sheet time labels used an offset
+origin; corrected clock sheet v2 and original frame timestamps are authoritative.
