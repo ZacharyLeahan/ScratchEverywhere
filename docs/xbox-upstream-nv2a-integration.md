@@ -167,6 +167,28 @@ The NXDK build and existing costume-cache, cache-lifetime, Scratch 2 text and
 real SVG bounds/pixels checks pass. Thin terrain seams, a full Level One clear,
 physical smoothness and the remaining game/hardware gates are still open.
 
+## Filtered texture edges
+
+Appel's thin internal terrain lines expose zero-filled padding in native
+swizzled textures. A 62x62 SVG rasterizes to 82x82 opaque pixels inside a 128x128
+GPU allocation. Linear filtering can sample the transparent black padding;
+GPU clamp applies to the allocation, beyond the image's smaller UV extent.
+Native uploads now duplicate one texel at the right and bottom edges, including
+the corner, to cover the bilinear filter footprint. The ordinary and allocation-
+fallback upload paths share this operation. Image dimensions, UVs, original
+pixels and authored terrain are unchanged.
+
+Candidate `807d1928...` removes the observed title-terrain lines and remains
+clean in the captured walking/jumping scenes. Read-only GPU dumps confirm that
+both checked terrain textures retain byte-identical interiors, with the new
+border matching the last original row/column. A static 74,094-pixel title crop
+has 216 dark line pixels before and zero afterwards; these are separate guest
+runs, not a same-frame reversal experiment. The unchanged color/pen fixture
+still passes 107/107 samples (maximum channel error 7), with PASSES=5 / ERRORS=0 /
+CYCLES=40. The upload helper passes 27 shape/format combinations with ASan/UBSan,
+including row pitches, one-dimensional images, repeated updates and guards.
+Hardware artwork and performance qualification remain pending.
+
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
 texture/pen behavior, and continue every open gate in the

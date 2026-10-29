@@ -248,3 +248,51 @@ void swizzle_subrect(
         }
     }
 }
+
+static uint32_t swizzled_coordinate(unsigned int coordinate, uint32_t mask)
+{
+    uint32_t result = 0;
+    for (uint32_t bit = 1; mask; bit <<= 1) {
+        uint32_t destination_bit = mask & -mask;
+        if (coordinate & bit) result |= destination_bit;
+        mask &= mask - 1;
+    }
+    return result;
+}
+
+void swizzle_subrect_clamped(
+    const uint8_t *src_buf, unsigned int width, unsigned int height,
+    unsigned int dst_width, unsigned int dst_height, uint8_t *dst_buf,
+    unsigned int row_pitch, unsigned int bytes_per_pixel)
+{
+    swizzle_subrect(src_buf, width, height, dst_width, dst_height,
+                    dst_buf, row_pitch, bytes_per_pixel);
+    if (!width || !height || (width == dst_width && height == dst_height)) return;
+
+    // GPU clamp uses the POT allocation, not the smaller image's UV extent.
+    // One replicated texel covers the linear filter footprint at each edge.
+    uint32_t mask_x, mask_y, mask_z;
+    generate_swizzle_masks(dst_width, dst_height, 1, &mask_x, &mask_y, &mask_z);
+    if (width < dst_width) {
+        const uint32_t edge_x = swizzled_coordinate(width, mask_x);
+        uint32_t off_y = 0;
+        for (unsigned int y = 0; y < height; ++y) {
+            memcpy(dst_buf + (edge_x + off_y) * bytes_per_pixel,
+                   src_buf + y * row_pitch + (width - 1) * bytes_per_pixel,
+                   bytes_per_pixel);
+            off_y = (off_y - mask_y) & mask_y;
+        }
+    }
+    if (height < dst_height) {
+        const uint32_t edge_y = swizzled_coordinate(height, mask_y);
+        const uint8_t *last_row = src_buf + (height - 1) * row_pitch;
+        uint32_t off_x = 0;
+        const unsigned int count = width + (width < dst_width ? 1 : 0);
+        for (unsigned int x = 0; x < count; ++x) {
+            const unsigned int source_x = x < width ? x : width - 1;
+            memcpy(dst_buf + (off_x + edge_y) * bytes_per_pixel,
+                   last_row + source_x * bytes_per_pixel, bytes_per_pixel);
+            off_x = (off_x - mask_x) & mask_x;
+        }
+    }
+}

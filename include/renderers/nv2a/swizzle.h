@@ -47,6 +47,17 @@ void swizzle_subrect(
     unsigned int row_pitch,
     unsigned int bytes_per_pixel);
 
+// Duplicate the last texel beyond NPOT content for bilinear clamp sampling.
+void swizzle_subrect_clamped(
+    const uint8_t *src_buf,
+    unsigned int width,
+    unsigned int height,
+    unsigned int dst_width,
+    unsigned int dst_height,
+    uint8_t *dst_buf,
+    unsigned int row_pitch,
+    unsigned int bytes_per_pixel);
+
 void generate_swizzle_masks(
     unsigned int width,
     unsigned int height,

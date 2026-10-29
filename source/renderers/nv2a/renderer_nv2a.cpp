@@ -900,7 +900,7 @@ bool Renderer_NV2A::updateTexture(NV2ATexture *texture, const void *pixels, int 
             if (texture->texWidth != texture->dataWidth || texture->texHeight != texture->dataHeight) {
                 memset(s_stage, 0, bytes); // keep NPOT padding zeroed
             }
-            swizzle_subrect(static_cast<const uint8_t *>(pixels),
+            swizzle_subrect_clamped(static_cast<const uint8_t *>(pixels),
                             texture->texWidth, texture->texHeight,
                             texture->dataWidth, texture->dataHeight,
                             s_stage, pitch, texture->bytesPerPixel);
@@ -911,7 +911,7 @@ bool Renderer_NV2A::updateTexture(NV2ATexture *texture, const void *pixels, int 
                 s_stageCap = 0;
             }
         } else {
-            swizzle_subrect(static_cast<const uint8_t *>(pixels),
+            swizzle_subrect_clamped(static_cast<const uint8_t *>(pixels),
                             texture->texWidth, texture->texHeight,
                             texture->dataWidth, texture->dataHeight,
                             texture->data, pitch, texture->bytesPerPixel);
