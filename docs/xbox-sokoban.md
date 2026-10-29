@@ -262,3 +262,24 @@ image checks remain the stronger oracle for partial-tile corruption; initial
 center samples alone do not establish pixel-perfect boards. All earlier owned
 forensic guests have been closed. The installed canonical archive remains
 `efdbc005...`; full-set hardware and audio gates remain open.
+
+### Fixed-build natural transition to puzzle ten
+
+The fresh `78cb682a...` replay completed puzzles one through nine naturally,
+reaching ten at cumulative move 1,312. All 120 initial tile centers matched.
+The settled initial image and diagnostic polls four/twelve/thirty also match
+a separately captured clean board exactly across the complete padded board
+rectangle: **0 differing pixels out of 105,910**. The first transition probe
+still displays the completed level-nine screen; it is retained separately,
+not treated as a settled level-ten failure or acceptance image. The full
+thirteen-puzzle run remains in progress, and physical full-set testing is open.
+
+A separate check of the [original official Scratch player](https://scratch.mit.edu/projects/24490009/)
+produced two upward moves from a requested 400 ms key hold on level one
+(the UI call took 458 ms). The source's `g_mT` repeat counter advances per
+authored Tick call, not elapsed time. This reference check does not measure
+normal Xbox repeat speed; multi-hour debugger replay wall time is not a game
+pacing/FPS benchmark. No source or project timing was changed. Original browser
+images/action receipts are under ignored `build-xbox/sokoban-reference-player-20261028/`;
+the complete-board comparison is `level10-complete-board-audit.json` under
+`build-xbox/sokoban-texture-fullset-20261028/` in the primary checkout.
