@@ -182,7 +182,7 @@ preserved. The disposable guests and debuggers are closed.
 
 A fresh, unseeded repeat used the same candidate archive and normal executable.
 The observer now waits for both level initialization and the authored drawing
-flag to finish before settling and capturing. The first seven boards matched;
+flag to finish before settling and capturing. The first seven boards' sampled centers matched;
 puzzle eight's initial image missed two floor cells (265 of 267 sampled cells
 across eight boards matched). The repeat was stopped after **169 verified
 moves**, at puzzle eight, to investigate this earlier reproduction. It did not
@@ -198,10 +198,27 @@ screen composition; the exact cause remains open.
 
 An ordinary R restart produced a clean 72-cell board. A subsequent bounded
 restart probe reproduced a missing floor tile on its second captured restart: 71 of 72
-cells matched, with the logical map and player still correct. This gives a short
-reproduction in the retained guest. It has not yet been established as a fresh-
-boot reproduction. Extra tracing changes timing, so a clean traced redraw does
-not establish that tracing or a proposed GPU change fixes it.
+cells matched, with the logical map and player still correct. Extra tracing
+changes timing, so a clean traced redraw does not establish a fix.
+
+A fresh private guest then reproduced the problem with the same normal
+executable and a separate fixture containing only one added script: select
+puzzle eight after a one-second delay. All assets and the remaining project
+were verified unchanged. Tile-center checks passed the first fourteen captured
+restarts, then found two missing floor cells on capture fifteen. A stronger
+comparison of all **174,936 board pixels**, against a visually reviewed clean
+reference, also found smaller defects on captures six and fourteen. Center
+samples alone therefore undercount the visual failures. The fixture SHA-256 is
+`ef1678b2f5918608f37e6df23a6b8795c79d401f194bd254ae5bd394872c9650`.
+
+A separate current-main experiment invalidated the GPU vertex buffer cache
+before each geometry draw. The changed dependency source and compiled command
+were verified; matching symbols supplied all debugger addresses. Its first
+restart still had a correct logical map/player but 4,212 differing board pixels
+and a missing floor sample. **That experiment was rejected and its source
+change reverted.** It was neither merged nor installed on the Xbox. The short
+reproduction makes further investigation possible without another multi-hour
+playthrough; the actual rendering fix remains open.
 
 These are private emulator findings, not physical controller, performance or
 audio acceptance. Original images, logical states, direct pen-surface bytes,
