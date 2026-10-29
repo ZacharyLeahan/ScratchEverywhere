@@ -178,6 +178,37 @@ executable and retain all assets. These clean results do not explain the earlier
 mismatch or establish a visually clean full run. All original images are
 preserved. The disposable guests and debuggers are closed.
 
+### October 28 rendering follow-up
+
+A fresh, unseeded repeat used the same candidate archive and normal executable.
+The observer now waits for both level initialization and the authored drawing
+flag to finish before settling and capturing. The first seven boards matched;
+puzzle eight's initial image missed two floor cells (265 of 267 sampled cells
+across eight boards matched). The repeat was stopped after **169 verified
+moves**, at puzzle eight, to investigate this earlier reproduction. It did not
+repeat the complete thirteen-puzzle run.
+
+With input restored to neutral, a read-only debugger check matched the complete
+logical map and player against the independent route. Initialization and drawing
+were both complete. Two identical, settled framebuffer captures still disagreed
+with four cells. A separate read-only dump of the pen render target contained
+the same four wrong cells: three were transparent and one showed floor instead
+of a goal. The defect therefore exists in the drawing surface before final
+screen composition; the exact cause remains open.
+
+An ordinary R restart produced a clean 72-cell board. A subsequent bounded
+restart probe reproduced a missing floor tile on its second captured restart: 71 of 72
+cells matched, with the logical map and player still correct. This gives a short
+reproduction in the retained guest. It has not yet been established as a fresh-
+boot reproduction. Extra tracing changes timing, so a clean traced redraw does
+not establish that tracing or a proposed GPU change fixes it.
+
+These are private emulator findings, not physical controller, performance or
+audio acceptance. Original images, logical states, direct pen-surface bytes,
+compiled Xbox structure-layout offsets and input-restoration receipts are in
+ignored `build-xbox/sokoban-visual-repeat-20261028/` in the primary checkout.
+The physical Xbox's installed archive and executable were not changed.
+
 **This candidate has not been installed or tested on the physical Xbox.** The
 installed default prepared archive remains `efdbc005…`. A complete physical
 playthrough, full-set visual acceptance and audio qualification remain open. Local source,
