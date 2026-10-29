@@ -243,3 +243,22 @@ playthrough, full-set visual acceptance and audio qualification remain open. Loc
 independent replay and completed runtime evidence are under ignored
 `build-xbox/sokoban-full-20261027/` in the primary checkout; the separate visual
 probe is under `build-xbox/sokoban-stamp-forensics-20261027/`.
+
+### Texture-lifetime repair candidate
+
+[Draft PR #42](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/42)
+localizes the redraw defect to texture storage freed before GPU reads finish.
+A standalone offline diagnostic loses a tile on draw four with unmodified main;
+the normal fixed build passes 100 unchanged draws. The selected-level-eight
+Sokoban fixture also passes 100 complete-image comparisons in xemu and twenty
+physical controller restart commands with 21 clean settled board captures.
+This is rendering evidence for the separate runtime fix, not physical testing
+of this full-set archive. Native color/pen regression still reports 38 passes.
+
+A fresh full-set replay of archive `8253ed9a...` is running from normal level
+one on fixed XBE `78cb682a...`; every map/player transition and each initial
+board's tile centers are checked. Its full result is pending. The complete
+image checks remain the stronger oracle for partial-tile corruption; initial
+center samples alone do not establish pixel-perfect boards. All earlier owned
+forensic guests have been closed. The installed canonical archive remains
+`efdbc005...`; full-set hardware and audio gates remain open.
