@@ -3,6 +3,9 @@
 For a short current summary of hardware versus emulator results, measured
 performance and known issues, see [Xbox game status](xbox-game-status.md).
 This checklist retains the detailed physical acceptance gates.
+Older sections describe their then-current builds, including historical lwmem
+checks; current upstream removes the Xbox lwmem override. Use the
+[current build guide](xbox-fork-build.md) for main.
 
 The goal is all twenty-one installed games thoroughly tested on the physical
 Xbox, with fixes until each works. Downloads, successful builds, and a title

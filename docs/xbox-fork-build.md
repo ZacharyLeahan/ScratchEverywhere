@@ -5,8 +5,12 @@ This fork starts from `ScratchEverywhere/ScratchEverywhere` at
 `ScratchEverywhere-OGXbox` fork was archived on October 19, 2026; its README
 directs users to upstream, which now includes the Xbox port.
 
-The Xbox target uses NXDK, the Ryzee119 SDL3 port, and the compatibility
-patches in `cmake/patches`. The SDK revision matches `docker/Dockerfile.xbox`.
+Current main includes the [October 29 upstream integration](xbox-upstream-nv2a-integration.md)
+and supports both the native NV2A renderer/window with dedicated Xbox audio and
+the legacy Xbox SDL path. Compatibility patches remain in `cmake/patches`;
+the SDK revision matches `docker/Dockerfile.xbox`. Existing saved renderer
+preferences are respected. Build success does not qualify either path on hardware;
+see the [21-game status and known issues](xbox-game-status.md).
 
 ## Native build
 
@@ -51,7 +55,8 @@ for the driver change that exposed this cache issue.
 On October 25, 2026, `bash scripts/build-xbox.sh` completed on macOS with
 Homebrew Clang 23.1.2 and Rust 1.99.1, using the default Xbox options. The XBE
 header begins with `XBEH`; packaging added that XBE to the XISO successfully.
-No emulator or hardware boot test has been performed.
+That initial build had not yet been boot-tested. Later, separately identified
+emulator and physical results are recorded in the [game status](xbox-game-status.md).
 
 | Output | Bytes | SHA-256 |
 | --- | ---: | --- |
@@ -84,18 +89,29 @@ additional RAM; it does not add RAM to a retail console. Python 3 is required
 for this packaging step. Set the option to `OFF` to retain CXBE's original
 memory-limit flag for comparison.
 
-The 128MB hardware test loaded Appel with complete map lists using NXDK's
-native allocator. Reproduce that configuration with:
+Earlier 128MB hardware tests loaded Appel's complete map lists with NXDK's
+native allocator. Upstream has since removed the Xbox lwmem override;
+`SE_USE_LWMEM` is no longer a current Xbox build option. Historical lwmem
+investigations in older test notes do not describe the current allocator.
+
+The combined October 29 source tree builds with:
 
 ```sh
-bash scripts/build-xbox.sh -DSE_XBOX_FORCE_480P=ON -DSE_MENU=ON \
-  -DSE_LOADSCREEN=OFF -DSE_USE_LWMEM=OFF
+BUILD_JOBS=4 bash scripts/build-xbox.sh \
+  -DSE_XBOX_FORCE_480P=ON -DSE_XBOX_ALLOW_EXPANDED_RAM=ON \
+  -DSE_XBOX_DEBUG_SYMBOLS=ON \
+  -DSE_XBOX_PROFILE_FRAMES=OFF -DSE_XBOX_PROFILE_THREADS=OFF \
+  -DSE_XBOX_TRACE_GAME_STATE=OFF -DSE_XBOX_TRACE_MENU_INPUT=OFF
 ```
 
-The default lwmem configuration remains available and needs a separate Appel
-loading investigation. For diagnostics only, `SE_XBOX_TRACE_GAME_STATE=ON`
-logs stage variables when the runtime pause menu opens. It defaults to `OFF`.
-See `xbox-game-qualification.md` for the test limitations and outstanding bugs.
+This produces a Release XBE and matching debug symbols with profiling/input
+tracing disabled. The merged build and 21 affected host checks pass; that does
+not replace native-backend physical acceptance or establish FPS. The latest
+physical test launcher remains separate from the newly merged build.
+
+For diagnostics only, `SE_XBOX_TRACE_GAME_STATE=ON` logs stage variables when
+the runtime pause menu opens. It defaults to `OFF`. See the
+[hardware checklist](xbox-game-qualification.md) for remaining tests.
 
 
 ## Upstream synchronization (October 26, 2026)
