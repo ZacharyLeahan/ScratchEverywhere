@@ -74,8 +74,7 @@ struct NV2AVertex {
 enum class NV2ABlendMode {
     None,
     Blend,
-    // Additive, using the *vertex* RGB scaled by (texture alpha * vertex alpha). The texture's own colour is not
-    // added; this is what the brightness effect needs (adds white shaped by the sprite's alpha).
+    // Additive vertex RGB scaled by (texture alpha * vertex alpha).
     Add,
     Premultiplied,
 };
@@ -132,6 +131,7 @@ class SE_EXPORT Renderer_NV2A : public Renderer {
     void bindTexture(const NV2ATexture *texture);
     void unbindTexture();
     void setBlendMode(NV2ABlendMode mode);
+    void setTextureBrightness(int brightness);
     void setScissor(int x, int y, int w, int h);
     void clearScissor();
     void setViewport(int x, int y, int w, int h);

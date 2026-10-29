@@ -62,24 +62,33 @@ natural ending at Score 11 / Timer 0. Its 175,500-pixel lettering crop matches t
 controlled linear result exactly; the backdrop texture hash is unchanged. A
 read-only trace observes 32 recognized SVG binds, all linear. Short Start replays
 at Score 0 / Timer 29, the left stick steers both ways, and Back / Return to game
-list redraws the browser. These checks exercise ordinary SVG drawing; tiled,
-mesh, pixelate and bitmap visual acceptance still need their own runtime checks.
+list redraws the browser. These Catch checks exercise ordinary SVG drawing; broader artwork and sampling
+quality still need review beyond the solid-color checks below.
 Both comparison guests report the standard-memory policy despite the emulator's
 128MB configuration: the backdrop raster is 334×249 in a 16-bit texture. This
 neither qualifies a retail 64MB Xbox nor proves title-visible expanded RAM.
 
-The existing color/pen fixture reaches PASSES=5 / ERRORS=0 / CYCLES=40,
-but only 98 of 107 expected image samples pass. The frozen pre-SVG build has
-the same values at all 107 samples: these brightness/hue/pen mismatches predate
-the SVG fix. Native rendering is not fully qualified.
+Native brightness now adds a signed RGB offset and clamps before transparency,
+in one draw pass. It retains the shared 96-step hue cache. Pen compositing uses
+its stored premultiplied color without applying transparency a second time.
 
-Pen compositing now avoids multiplying stored alpha a second time. In a paired
-fixture with hue and brightness disabled only on the two pen stamps, the
-half-transparent red stamp improves from RGB (71,16,25) to (135,16,25), versus
-expected (136,16,24); the opaque stamp and all other 106 samples are unchanged.
-The full original fixture still passes 98/107: its brightened translucent stamp
-improves substantially but remains outside tolerance, alongside eight other
-brightness/hue samples. These remain open, as do physical pen/audio checks.
+The compiled brightness candidate `ab2481f2...` passes **107/107** independent
+samples in the unchanged [color/pen fixture](../examples/make-color-effects-test.py)
+(maximum channel error 7, tolerance 9), with PASSES=5 / ERRORS=0 / CYCLES=40.
+The preceding builds passed 98/107, with identical colors before and after the
+SVG fix, establishing that these errors predated that change.
+
+The new [brightness draw-path fixture](../examples/make-nv2a-brightness-test.py)
+also passes **60/60** solid-center checks with standard memory policy and again
+with an explicit expanded-renderer-policy override (maximum errors 9 and 2).
+A bounded read-only trace confirms mosaic wrap/grid, pixelate and deformed paths;
+the expanded-policy run additionally executes tiled stage/bitmap draws, including
+brightness -50, +50, -100 and +100. The standard-policy guest downsizes the large
+bitmap, so it does not establish tiled coverage. The override changes only the
+disposable guest's renderer policy; it does not validate RAM detection or physical
+128MB hardware. Back / Return to game list redraws the menu/browser without a
+brightness tint afterwards. Physical rendering, pen/sensing and audio acceptance
+remain open.
 
 The final post-theme XBE `f79fcd52...` also reaches the native launcher twice,
 once after the controller reboot. A 90-video-frame reset hold does not reboot;

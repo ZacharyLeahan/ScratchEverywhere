@@ -449,7 +449,6 @@ void Image_NV2A::renderTiled(ImageRenderParams &params) {
 
     const float x = params.x;
     const float y = params.y;
-    const int brightness = params.brightness;
     const double rotationRad = params.rotation;
     const float scale = params.scale;
     const float opacity = params.opacity;
@@ -563,20 +562,7 @@ void Image_NV2A::renderTiled(ImageRenderParams &params) {
         }
     };
 
-    if (brightness > 0) {
-        float b = brightness * 0.01f;
-        drawPass(255, 255, 255, alpha, NV2ABlendMode::Blend);
-        uint8_t addA = static_cast<uint8_t>(255.0f * b * opacity);
-        if (addA > 0) {
-            drawPass(255, 255, 255, addA, NV2ABlendMode::Add);
-        }
-    } else if (brightness < 0) {
-        float b = brightness * 0.01f;
-        uint8_t dim = static_cast<uint8_t>(255.0f * std::clamp(1.0f + b, 0.0f, 1.0f));
-        drawPass(dim, dim, dim, alpha, NV2ABlendMode::Blend);
-    } else {
-        drawPass(255, 255, 255, alpha, NV2ABlendMode::Blend);
-    }
+    drawPass(255, 255, 255, alpha, NV2ABlendMode::Blend);
 }
 
 static void *extractProjectAsset(const std::string &assetName, size_t &outSize);
@@ -907,7 +893,6 @@ static bool computePixelateDims(const ImageRenderParams &params, int srcW, int s
     return true;
 }
 
-
 static constexpr int EFFECT_HUE_STEPS = 96;            // 1536 / 96 = 16 hue units (3.75 deg) per step
 static constexpr uint16_t EFFECT_NO_HUE = 0xFFFF;
 static constexpr uint32_t EFFECT_IDLE_FRAMES = 150;    // drop cached bakes unused for this many frames
@@ -1186,19 +1171,11 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
     return tex;
 }
 
-static inline void setNV2AVertexColor(NV2AVertex &v, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    v.color[0] = r;
-    v.color[1] = g;
-    v.color[2] = b;
-    v.color[3] = a;
-}
-
 void Image_NV2A::renderMosaic(ImageRenderParams &params, NV2ATexture *activeTex) {
     if (!activeTex || !nv2aRenderer) return;
 
     const float x = params.x;
     const float y = params.y;
-    const int brightness = params.brightness;
     const double rotationRad = params.rotation;
     const float scale = params.scale;
     const float opacity = params.opacity;
@@ -1272,30 +1249,8 @@ void Image_NV2A::renderMosaic(ImageRenderParams &params, NV2ATexture *activeTex)
         const NV2AScaleMode mosaicScaleMode = samplingMode(activeTex, std::abs(params.pixelateEffect) > 0.001f);
         nv2aRenderer->bindTexture(activeTex, mosaicScaleMode, /*wrap=*/true);
 
-        if (brightness > 0) {
-            float b = brightness * 0.01f;
-            nv2aRenderer->setBlendMode(NV2ABlendMode::Blend);
-            nv2aRenderer->drawTriangles(quadVerts, 6);
-            uint8_t addA = static_cast<uint8_t>(255.0f * b * opacity);
-            if (addA > 0) {
-                for (int i = 0; i < 6; ++i) {
-                    setNV2AVertexColor(quadVerts[i], 255, 255, 255, addA);
-                }
-                nv2aRenderer->setBlendMode(NV2ABlendMode::Add);
-                nv2aRenderer->drawTriangles(quadVerts, 6);
-            }
-        } else if (brightness < 0) {
-            float b = brightness * 0.01f;
-            uint8_t dim = static_cast<uint8_t>(255.0f * std::clamp(1.0f + b, 0.0f, 1.0f));
-            for (int i = 0; i < 6; ++i) {
-                setNV2AVertexColor(quadVerts[i], dim, dim, dim, alpha);
-            }
-            nv2aRenderer->setBlendMode(NV2ABlendMode::Blend);
-            nv2aRenderer->drawTriangles(quadVerts, 6);
-        } else {
-            nv2aRenderer->setBlendMode(NV2ABlendMode::Blend);
-            nv2aRenderer->drawTriangles(quadVerts, 6);
-        }
+        nv2aRenderer->setBlendMode(NV2ABlendMode::Blend);
+        nv2aRenderer->drawTriangles(quadVerts, 6);
         return;
     }
 
@@ -1332,11 +1287,6 @@ void Image_NV2A::renderMosaic(ImageRenderParams &params, NV2ATexture *activeTex)
     size_t vertCount = 0;
 
     uint8_t cr = 255, cg = 255, cb = 255;
-    if (brightness < 0) {
-        float b = brightness * 0.01f;
-        uint8_t dim = static_cast<uint8_t>(255.0f * std::clamp(1.0f + b, 0.0f, 1.0f));
-        cr = cg = cb = dim;
-    }
 
     for (int row = 0; row < N; ++row) {
         float rY_x = p00.first + row * stepVx;
@@ -1368,18 +1318,6 @@ void Image_NV2A::renderMosaic(ImageRenderParams &params, NV2ATexture *activeTex)
     nv2aRenderer->bindTexture(activeTex, mosaicScaleMode, /*wrap=*/false);
     nv2aRenderer->setBlendMode(NV2ABlendMode::Blend);
     nv2aRenderer->drawTriangles(s_mosaicVerts, vertCount);
-
-    if (brightness > 0) {
-        float b = brightness * 0.01f;
-        uint8_t addA = static_cast<uint8_t>(255.0f * b * opacity);
-        if (addA > 0) {
-            for (size_t i = 0; i < vertCount; ++i) {
-                setNV2AVertexColor(s_mosaicVerts[i], 255, 255, 255, addA);
-            }
-            nv2aRenderer->setBlendMode(NV2ABlendMode::Add);
-            nv2aRenderer->drawTriangles(s_mosaicVerts, vertCount);
-        }
-    }
 }
 
 void Image_NV2A::renderPixelate(ImageRenderParams &params, NV2ATexture *activeTex) {
@@ -1387,7 +1325,6 @@ void Image_NV2A::renderPixelate(ImageRenderParams &params, NV2ATexture *activeTe
 
     const float x = params.x;
     const float y = params.y;
-    const int brightness = params.brightness;
     const double rotationRad = params.rotation;
     const float scale = params.scale;
     const float opacity = params.opacity;
@@ -1472,11 +1409,6 @@ void Image_NV2A::renderPixelate(ImageRenderParams &params, NV2ATexture *activeTe
         }
 
         uint8_t cr = 255, cg = 255, cb = 255;
-        if (brightness < 0) {
-            float b = brightness * 0.01f;
-            uint8_t dim = static_cast<uint8_t>(255.0f * std::clamp(1.0f + b, 0.0f, 1.0f));
-            cr = cg = cb = dim;
-        }
 
         NV2AVertex quadVerts[6] = {
             {{p_tl.first, p_tl.second}, {cr, cg, cb, alpha}, {baseU0, baseV0}},
@@ -1490,18 +1422,6 @@ void Image_NV2A::renderPixelate(ImageRenderParams &params, NV2ATexture *activeTe
         nv2aRenderer->bindTexture(activeTex, NV2AScaleMode::Nearest, /*wrap=*/false);
         nv2aRenderer->setBlendMode(NV2ABlendMode::Blend);
         nv2aRenderer->drawTriangles(quadVerts, 6);
-
-        if (brightness > 0) {
-            float b = brightness * 0.01f;
-            uint8_t addA = static_cast<uint8_t>(255.0f * b * opacity);
-            if (addA > 0) {
-                for (int i = 0; i < 6; ++i) {
-                    setNV2AVertexColor(quadVerts[i], 255, 255, 255, addA);
-                }
-                nv2aRenderer->setBlendMode(NV2ABlendMode::Add);
-                nv2aRenderer->drawTriangles(quadVerts, 6);
-            }
-        }
     };
 
     // In Scratch 3 WebGL shader:
@@ -1544,11 +1464,6 @@ void Image_NV2A::renderPixelate(ImageRenderParams &params, NV2ATexture *activeTe
     size_t vertCount = 0;
 
     uint8_t cr = 255, cg = 255, cb = 255;
-    if (brightness < 0) {
-        float b = brightness * 0.01f;
-        uint8_t dim = static_cast<uint8_t>(255.0f * std::clamp(1.0f + b, 0.0f, 1.0f));
-        cr = cg = cb = dim;
-    }
 
     const float invEffW = 1.0f / static_cast<float>(effW);
     const float invEffH = 1.0f / static_cast<float>(effH);
@@ -1588,18 +1503,6 @@ void Image_NV2A::renderPixelate(ImageRenderParams &params, NV2ATexture *activeTe
     nv2aRenderer->bindTexture(activeTex, NV2AScaleMode::Nearest, /*wrap=*/false);
     nv2aRenderer->setBlendMode(NV2ABlendMode::Blend);
     nv2aRenderer->drawTriangles(s_pixelateVerts, vertCount);
-
-    if (brightness > 0) {
-        float b = brightness * 0.01f;
-        uint8_t addA = static_cast<uint8_t>(255.0f * b * opacity);
-        if (addA > 0) {
-            for (size_t i = 0; i < vertCount; ++i) {
-                setNV2AVertexColor(s_pixelateVerts[i], 255, 255, 255, addA);
-            }
-            nv2aRenderer->setBlendMode(NV2ABlendMode::Add);
-            nv2aRenderer->drawTriangles(s_pixelateVerts, vertCount);
-        }
-    }
 }
 
 void Image_NV2A::renderDeformedMesh(ImageRenderParams &params, NV2ATexture *activeTex,
@@ -1608,7 +1511,6 @@ void Image_NV2A::renderDeformedMesh(ImageRenderParams &params, NV2ATexture *acti
 
     const float x = params.x;
     const float y = params.y;
-    const int brightness = params.brightness;
     const double rotationRad = params.rotation;
     const float scale = params.scale;
     const float opacity = params.opacity;
@@ -1766,11 +1668,6 @@ void Image_NV2A::renderDeformedMesh(ImageRenderParams &params, NV2ATexture *acti
     size_t vertCount = 0;
 
     uint8_t cr = 255, cg = 255, cb = 255;
-    if (brightness < 0) {
-        float b = brightness * 0.01f;
-        uint8_t dim = static_cast<uint8_t>(255.0f * std::clamp(1.0f + b, 0.0f, 1.0f));
-        cr = cg = cb = dim;
-    }
 
     for (int j = 0; j < M; ++j) {
         for (int i = 0; i < M; ++i) {
@@ -1793,18 +1690,6 @@ void Image_NV2A::renderDeformedMesh(ImageRenderParams &params, NV2ATexture *acti
     nv2aRenderer->bindTexture(activeTex, meshScaleMode, /*wrap=*/false);
     nv2aRenderer->setBlendMode(NV2ABlendMode::Blend);
     nv2aRenderer->drawTriangles(s_deformedVerts, vertCount);
-
-    if (brightness > 0) {
-        float b = brightness * 0.01f;
-        uint8_t addA = static_cast<uint8_t>(255.0f * b * opacity);
-        if (addA > 0) {
-            for (size_t k = 0; k < vertCount; ++k) {
-                setNV2AVertexColor(s_deformedVerts[k], 255, 255, 255, addA);
-            }
-            nv2aRenderer->setBlendMode(NV2ABlendMode::Add);
-            nv2aRenderer->drawTriangles(s_deformedVerts, vertCount);
-        }
-    }
 }
 
 void Image_NV2A::render(ImageRenderParams &params) {
@@ -1812,6 +1697,12 @@ void Image_NV2A::render(ImageRenderParams &params) {
         nv2aRenderer = static_cast<Renderer_NV2A *>(Render::getGlobalRenderer());
     }
     if (!nv2aRenderer) return;
+
+    nv2aRenderer->setTextureBrightness(params.brightness);
+    struct BrightnessReset {
+        Renderer_NV2A *renderer;
+        ~BrightnessReset() { renderer->setTextureBrightness(0); }
+    } brightnessReset{nv2aRenderer};
 
     bool hasWhirl = (std::abs(params.whirlEffect) > 0.001f);
     bool hasFisheye = (std::abs(params.fisheyeEffect) > 0.001f);
@@ -1877,7 +1768,6 @@ void Image_NV2A::render(ImageRenderParams &params) {
 
     const float x = params.x;
     const float y = params.y;
-    const int brightness = params.brightness;
     const double rotationRad = params.rotation;
     const float scale = params.scale;
     const float opacity = params.opacity;
@@ -1961,20 +1851,7 @@ void Image_NV2A::render(ImageRenderParams &params) {
         nv2aRenderer->drawTriangles(verts, 6);
     };
 
-    if (brightness > 0) {
-        float b = brightness * 0.01f;
-        drawQuad(255, 255, 255, alpha, NV2ABlendMode::Blend);
-        uint8_t addA = static_cast<uint8_t>(255.0f * b * opacity);
-        if (addA > 0) {
-            drawQuad(255, 255, 255, addA, NV2ABlendMode::Add);
-        }
-    } else if (brightness < 0) {
-        float b = brightness * 0.01f;
-        uint8_t dim = static_cast<uint8_t>(255.0f * std::clamp(1.0f + b, 0.0f, 1.0f));
-        drawQuad(dim, dim, dim, alpha, NV2ABlendMode::Blend);
-    } else {
-        drawQuad(255, 255, 255, alpha, NV2ABlendMode::Blend);
-    }
+    drawQuad(255, 255, 255, alpha, NV2ABlendMode::Blend);
 }
 
 void Image_NV2A::renderNineslice(double xPos, double yPos, double width, double height, double padding, bool centered) {

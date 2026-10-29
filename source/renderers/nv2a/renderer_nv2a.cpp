@@ -359,11 +359,11 @@ static inline void combinerInit() {
 }
 
 static bool s_activePremultiply = false;
+static int s_textureBrightness = 0;
+static int s_appliedBrightness = 0;
 
-// "Flat" texture combiner (used by NV2ABlendMode::Add): RGB comes from the vertex colour only and the texture just
-// supplies the alpha mask. Brightness is drawn as an additive pass of white * (texAlpha * vertexAlpha); the plain
-// textured combiner (tex.rgb * vertex.rgb) would add the sprite's *own* colour instead, so a dark UI never flashed
-// to white and bright-to-dark fades were invisible.
+// Additive passes use vertex RGB masked by texture alpha. Scratch brightness is
+// applied separately, inside the textured combiner before premultiplication.
 static bool s_activeFlatColor = false;  // wanted by the current blend mode
 static bool s_appliedFlatColor = false; // flavour baked into the combiner currently loaded on the GPU
 
@@ -438,17 +438,26 @@ static inline void textureCombinerApply() {
     const uint32_t colorBSource = s_activeFlatColor ? 0x0 : 0x4;
     const uint32_t colorBMap = s_activeFlatColor ? 0x1 : 0x6;
     s_appliedFlatColor = s_activeFlatColor;
+    const int brightness = s_activeFlatColor ? 0 : s_textureBrightness;
+    s_appliedBrightness = s_textureBrightness;
+    const uint32_t offset = static_cast<uint32_t>(std::lround(std::abs(brightness) * 2.55f));
+    p = pb_push1(p, NV097_SET_COMBINER_FACTOR0, offset | (offset << 8) | (offset << 16));
+
+    // RGB = clamp(texture * vertex + brightness, 0, 1), then the final combiner
+    // multiplies by alpha. Adding after blending cannot clamp translucent RGB correctly.
+    const uint32_t brightnessSource = brightness ? 0x1 : 0x0; // constant colour 0
+    const uint32_t brightnessMap = brightness < 0 ? 0x7 : 0x6; // signed negate / identity
 
     p = pb_push1(p, NV097_SET_COMBINER_COLOR_ICW + 0 * 4,
         XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_SOURCE, colorA) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_MAP, 0x6) |
         XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_SOURCE, colorBSource) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_MAP, colorBMap) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_MAP, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_MAP, 0x0));
+        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_SOURCE, brightnessSource) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_MAP, brightnessMap) |
+        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_MAP, 0x1));
 
     p = pb_push1(p, NV097_SET_COMBINER_COLOR_OCW + 0 * 4,
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DST, 0x4) |
+        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DST, 0x0) |
         XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_SUM_DST, 0x0) |
+        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_SUM_DST, 0x4) |
         XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_MUX_ENABLE, 0) |
         XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DOT_ENABLE, 0) |
         XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DOT_ENABLE, 0) |
@@ -929,7 +938,7 @@ void Renderer_NV2A::bindTexture(const NV2ATexture *texture, bool linear, bool wr
 void Renderer_NV2A::bindTexture(const NV2ATexture *texture, NV2AScaleMode scaleMode, bool wrap) {
     if (!texture || !texture->data) return;
 
-    if (s_activeShader != 1 || s_appliedFlatColor != s_activeFlatColor) {
+    if (s_activeShader != 1 || s_appliedFlatColor != s_activeFlatColor || s_appliedBrightness != s_textureBrightness) {
         textureCombinerApply();
         s_activeShader = 1;
     }
@@ -982,6 +991,11 @@ void Renderer_NV2A::unbindTexture() {
         s_activeShader = 0;
     }
     s_activeTexture = nullptr;
+}
+
+void Renderer_NV2A::setTextureBrightness(int brightness) {
+    // Defer the GPU state update until the next texture bind.
+    s_textureBrightness = std::clamp(brightness, -100, 100);
 }
 
 void Renderer_NV2A::setBlendMode(NV2ABlendMode mode) {
@@ -1831,6 +1845,8 @@ void Renderer_NV2A::beginFrame(int screen, int colorR, int colorG, int colorB) {
         s_activePremultiply = false;
         s_activeFlatColor = false;
         s_appliedFlatColor = false;
+        s_textureBrightness = 0;
+        s_appliedBrightness = 0;
         s_activeWrap = false;
         s_activeScaleMode = NV2AScaleMode::Nearest;
         s_frameIndex = (s_frameIndex + 1) % 3;
