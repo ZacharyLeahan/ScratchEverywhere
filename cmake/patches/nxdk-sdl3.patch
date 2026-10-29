@@ -191,12 +191,18 @@ index df82129..5e32d54 100644
      if (xgu_texture->data == NULL) {
          SDL_free(xgu_texture);
          return SDL_OutOfMemory();
-@@ -208,6 +272,10 @@ static void XBOX_DestroyTexture(SDL_Renderer *renderer, SDL_Texture *texture)
+@@ -208,6 +272,16 @@ static void XBOX_DestroyTexture(SDL_Renderer *renderer, SDL_Texture *texture)
          return;
      }
  
 +    if (render_data->active_texture == xgu_texture) {
 +        render_data->active_texture = NULL;
++    }
++
++    // Flushing SDL submits commands; the GPU can still be reading the image.
++    // Finish those reads before another allocation reuses its texture storage.
++    while (pb_busy()) {
++        Sleep(0);
 +    }
 +
      MmFreeContiguousMemory(xgu_texture->data);

@@ -40,6 +40,12 @@ Expected outputs are `build-xbox/default.xbe` for a modded Xbox and
 `build-xbox/scratch-xbox.iso` for xemu. Producing these files does not establish
 that a build boots or works on hardware; test separately.
 
+The Xbox SDL source cache includes the local `nxdk-sdl3.patch` hash. Editing
+that patch triggers reconfiguration and selects a new patched SDL checkout,
+so incremental builds cannot silently keep an earlier driver patch. Existing
+cache revisions are retained. See the [texture-retirement regression](xbox-texture-retirement.md)
+for the driver change that exposed this cache issue.
+
 ### First successful local build
 
 On October 25, 2026, `bash scripts/build-xbox.sh` completed on macOS with
