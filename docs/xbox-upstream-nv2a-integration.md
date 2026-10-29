@@ -261,8 +261,9 @@ buttons, with renderer/window 3/0. A separate cold-started snapshot guest repeat
 that exact list check and leaves the saved HDD byte-identical. Evidence is in
 `build-xbox/emulator-game-refresh-20261029/review.json` and its linked receipts
 and captures. Both guests exit cleanly with neutral controls. This refresh changes
-only the private emulator fixtures; physical installation, Appel v4 natural
-victory/replay, pacing/audio and every open hardware gate remain pending.
+only the private emulator fixtures. The later full v4 run below closes the
+emulator victory/replay gap; physical installation, pacing/audio and every open
+hardware gate remain pending.
 
 ## Spider Adventure full native playthrough — October 29
 
@@ -276,6 +277,40 @@ exceed 0.999 correlation in their bounded captures. See the
 [scoped gameplay/audio evidence](xbox-spider-adventure.md#native-emulator-full-run--october-29-2026).
 This closes the earlier short emulator run's ten-level gap, while physical
 victory, listening, pacing and all hardware qualification gates remain open.
+
+## Appel v4 natural victory and full replay — October 29
+
+The normal v4 archive `6ccd3f17...`, with all 460 assets and 45 sounds present,
+now finishes Level One on unchanged native `807d1928...` in the private 128 MB
+Vulkan xemu guest. The ordinary controller run reaches **17/35 apples, 1:07.8**
+and the authored WIN menu. It crosses both lifts, the spike tower, hidden
+passage, roof enemies and final platforms, with deaths/checkpoint recovery
+preserving collected apples. Read-only position checks guide takeoffs; no
+WIN seeding, gameplay-state writes, input-poll bypass or collision edits are used.
+
+D-pad navigation selects Replay and A/release activates it. With all external
+controls then neutral, the game's own complete recording reproduces the run,
+including its deaths and recoveries, and reaches WIN with the same apples,
+time and final X=5807.3594/Y=557.01. The 308-value BLACK BOX recording remains
+identical before and after playback. Its canonical JSON SHA-256 is
+`513f995a4a9898468a13b63e9ba3eb1adbc93ca0985a38221e73aac92557e06b`.
+This is a naturally recorded full replay, separate from the earlier seeded menu
+fixture and v3 victory.
+
+Try Again, selected with D-pad/A after replay, restores zero apples and no
+checkpoint; walking/jumping resume. Exit redraws the populated browser.
+Read-only inspection confirms zero game sprites, all 21 projects/42 buttons,
+and renderer/window 3/0. A fresh browser launch again reaches the title,
+controller level picker and moving/jumping Level One player; the second Exit
+repeats the zero-sprite/21-project/42-button check. The snapshot guest exits
+cleanly and the saved shared HDD stays byte-identical. No source or project
+changes were needed in this run.
+
+Ignored evidence is in `build-xbox/appel-v4-native-fullrun-20261029/review.json`,
+`natural-level-one-finish-full-recording.json`, `authored-replay-review.json`,
+the linked original screenshots/QMP receipts, and `browser-live-list.json`.
+Physical v4 deployment/victory/replay, TV movement acceptance, pacing, audio,
+lwmem and 64 MB support remain open. Emulator frame budgets are not FPS results.
 
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and

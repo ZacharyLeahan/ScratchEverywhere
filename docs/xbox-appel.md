@@ -397,3 +397,21 @@ receipts, original captures, closed UDP log, controller receipt and
 `physical-validation.json` are under ignored
 `build-xbox/render-phase-wiring-20261028/`. Startup/partial windows are excluded;
 the log receiver and controller were closed after the run.
+
+### Normal v4 victory and full replay in xemu, October 29
+
+The normal controller-menu v4 archive `6ccd3f17…` now completes Level One on
+unchanged native `807d1928…` with **17/35 apples and 1:07.8**. D-pad/A activates
+Replay from the natural victory menu; with external controls released, the
+complete authored recording reproduces the deaths, checkpoint recoveries and
+same ending. All 308 recording values remain identical. Try Again resets the
+round, walking/jumping resume, and Exit returns to all 21 games with zero game
+sprites left. A fresh launch again reaches the title, controller level picker
+and playable Level One, followed by another clean Exit.
+
+This uses the complete 460-asset/45-sound project and read-only position guidance,
+without gameplay-state writes or seeded WIN. It is emulator evidence, separate
+from the physical results above, and adds no FPS, subjective audio or 64 MB
+claim. Physical v4 victory/replay and movement acceptance remain pending. See
+[the scoped native integration result](xbox-upstream-nv2a-integration.md#appel-v4-natural-victory-and-full-replay--october-29)
+and ignored `build-xbox/appel-v4-native-fullrun-20261029/review.json`.
