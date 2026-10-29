@@ -512,6 +512,10 @@ static std::vector<NV2AVertex> s_penVerts;
 static bool s_lastCapValid = false;
 static float s_lastCapX = 0.0f, s_lastCapY = 0.0f, s_lastCapRadius = 0.0f;
 static uint32_t s_lastCapColor = 0;
+static std::vector<uint8_t> s_penColorPixels;
+static int s_penColorX = 0, s_penColorY = 0, s_penColorW = 0, s_penColorH = 0;
+static bool s_penColorDirty = true;
+
 
 static void updateViewportOverscan() {
     float ratio = s_nv2aVideoSettings.overscanRatio;
@@ -1343,6 +1347,7 @@ static void flushPenVerts(Renderer_NV2A *r) {
 }
 
 static inline void pushPenTri(Renderer_NV2A *r, const NV2AVertex &v0, const NV2AVertex &v1, const NV2AVertex &v2) {
+    s_penColorDirty = true;
     if (s_penVerts.size() + 3 > PEN_FLUSH_THRESHOLD) {
         flushPenVerts(r);
     }
@@ -1352,6 +1357,7 @@ static inline void pushPenTri(Renderer_NV2A *r, const NV2AVertex &v0, const NV2A
 }
 
 static inline void pushPenQuad(Renderer_NV2A *r, const NV2AVertex &v0, const NV2AVertex &v1, const NV2AVertex &v2, const NV2AVertex &v3) {
+    s_penColorDirty = true;
     if (s_penVerts.size() + 6 > PEN_FLUSH_THRESHOLD) {
         flushPenVerts(r);
     }
@@ -1400,6 +1406,8 @@ bool Renderer_NV2A::initPen() {
 #endif
 
     s_hasPenTexture = true;
+    s_penColorDirty = true;
+    s_penColorPixels.clear();
     s_penScaleY = static_cast<float>(penH) / static_cast<float>(Scratch::projectHeight > 0 ? Scratch::projectHeight : 360);
     s_penVerts.clear();
     s_penVerts.reserve(PEN_FLUSH_THRESHOLD + 1024);
@@ -1409,6 +1417,10 @@ bool Renderer_NV2A::initPen() {
 }
 
 void Renderer_NV2A::cleanupPen() {
+    s_penColorDirty = true;
+    s_penColorPixels.clear();
+    s_penColorPixels.shrink_to_fit();
+    s_penColorW = s_penColorH = 0;
     if (s_hasPenTexture) {
         ensureMainTarget();
 #ifdef __XBOX__
@@ -2117,6 +2129,7 @@ void Renderer_NV2A::penDotAccurate(Sprite *sprite) {
 }
 
 void Renderer_NV2A::penStamp(Sprite *sprite) {
+    s_penColorDirty = true;
     if (!s_hasPenTexture) return;
     flushPenVerts(this);
     s_lastCapValid = false;
@@ -2165,6 +2178,7 @@ void Renderer_NV2A::penStamp(Sprite *sprite) {
 }
 
 void Renderer_NV2A::penClear() {
+    s_penColorDirty = true;
     if (!s_hasPenTexture) return;
     s_penVerts.clear();
     s_lastCapValid = false;
@@ -2177,6 +2191,60 @@ void Renderer_NV2A::penClear() {
     }
     pb_wait_until_gr_not_busy();
 #endif
+}
+
+void Renderer_NV2A::preparePenColorQuery(float minX, float minY, float maxX, float maxY) {
+    if (!s_hasPenTexture || !s_penTexture.data) return;
+    const int width = s_penTexture.texWidth, height = s_penTexture.texHeight;
+    const int x0 = std::clamp(static_cast<int>(std::floor(minX * s_penScaleY + width / 2.0f)) - 1, 0, width);
+    const int y0 = std::clamp(static_cast<int>(std::floor(-maxY * s_penScaleY + height / 2.0f)) - 1, 0, height);
+    const int x1 = std::clamp(static_cast<int>(std::ceil(maxX * s_penScaleY + width / 2.0f)) + 2, 0, width);
+    const int y1 = std::clamp(static_cast<int>(std::ceil(-minY * s_penScaleY + height / 2.0f)) + 2, 0, height);
+    if (!s_penColorDirty && !s_penColorPixels.empty() && x0 >= s_penColorX && y0 >= s_penColorY &&
+        x1 <= s_penColorX + s_penColorW && y1 <= s_penColorY + s_penColorH) return;
+
+    s_penColorX = x0;
+    s_penColorY = y0;
+    s_penColorW = x1 - x0;
+    s_penColorH = y1 - y0;
+    s_penColorPixels.clear();
+    s_penColorDirty = false;
+    if (s_penColorW <= 0 || s_penColorH <= 0) return;
+
+    // Query only the subject's area, after queued strokes and stamps finish.
+    // The pen target is linear BGRA and already stores premultiplied RGB.
+    flushPenVerts(this);
+#ifdef __XBOX__
+    uint32_t *p = pb_begin();
+    p = pb_push1(p, NV097_WAIT_FOR_IDLE, 0);
+    pb_end(p);
+    while (pb_busy()) {
+        __asm__ __volatile__("pause");
+    }
+    pb_wait_until_gr_not_busy();
+    XVideoFlushFB();
+    nv2a_cache_flush();
+#endif
+    const size_t rowBytes = static_cast<size_t>(s_penColorW) * 4;
+    s_penColorPixels.resize(rowBytes * s_penColorH);
+    for (int row = 0; row < s_penColorH; ++row) {
+        memcpy(s_penColorPixels.data() + static_cast<size_t>(row) * rowBytes,
+               s_penTexture.data + static_cast<size_t>(y0 + row) * s_penTexture.pitch + static_cast<size_t>(x0) * 4,
+               rowBytes);
+    }
+}
+
+bool Renderer_NV2A::samplePenColor(float x, float y, uint8_t &r, uint8_t &g, uint8_t &b, uint8_t &a) {
+    if (s_penColorDirty || s_penColorPixels.empty()) return false;
+    const int px = static_cast<int>(std::floor(x * s_penScaleY + s_penTexture.texWidth / 2.0f)) - s_penColorX;
+    const int py = static_cast<int>(std::floor(-y * s_penScaleY + s_penTexture.texHeight / 2.0f)) - s_penColorY;
+    if (px < 0 || py < 0 || px >= s_penColorW || py >= s_penColorH) return false;
+    const uint8_t *pixel = s_penColorPixels.data() + (static_cast<size_t>(py) * s_penColorW + px) * 4;
+    b = pixel[0];
+    g = pixel[1];
+    r = pixel[2];
+    a = pixel[3];
+    return a != 0;
 }
 
 void Renderer_NV2A::renderPenLayer() {

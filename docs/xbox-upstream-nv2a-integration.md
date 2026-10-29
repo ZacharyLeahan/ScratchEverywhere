@@ -90,6 +90,22 @@ disposable guest's renderer policy; it does not validate RAM detection or physic
 brightness tint afterwards. Physical rendering, pen/sensing and audio acceptance
 remain open.
 
+The native backend now implements the fork's original-color restoration and
+pen-query hooks. Color sensing decodes the authored asset when CPU pixels have
+been freed, preserving the existing texture dimensions and GPU resources. Pen
+queries synchronize queued strokes/stamps and cache only the queried rectangle;
+drawing, clearing and cleanup invalidate that cache.
+
+The compiled sensing candidate `2dd1b385...` improves the unchanged
+[38-case regression](../examples/make-color-sensing-test.py) from **19 passes /
+19 errors** to **38 passes / 0 errors**. The same scripts/assets also pass with
+only the ordinary `hq=true` project comment added; GDB verifies a 640×480 pen
+canvas at scale 4/3. A frame-paced Start press reaches the actual Green Flag
+handler and the following result is again 38/0; both pen modes return cleanly to
+the browser. The latest binary retains **107/107** color-effect samples and
+PASSES=5 / ERRORS=0 / CYCLES=40. These are emulator checks; physical pen/collision
+acceptance and game-specific behavior still need testing.
+
 The final post-theme XBE `f79fcd52...` also reaches the native launcher twice,
 once after the controller reboot. A 90-video-frame reset hold does not reboot;
 release cancels it, and a fresh full hold reaches `XReboot` after 122 frames.

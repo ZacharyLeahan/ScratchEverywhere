@@ -701,6 +701,43 @@ void Image_NV2A::releaseEffects() {
     effectSource.shrink_to_fit();
 }
 
+bool Image_NV2A::ensureColorData() {
+    if (imgData.pixels) return true;
+    if (colorDataUnavailable || cachedAssetPath.empty()) return false;
+
+    // DXT caches retain only alpha for collisions, and backdrop uploads free
+    // their pixels. Decode the original asset on first color query: compressed
+    // GPU colors are lossy and cannot be used for Scratch's color comparisons.
+    const ImageData saved = imgData;
+    auto result = (Unzip::loader || Unzip::zipArchive)
+        ? init(cachedAssetPath, Unzip::zipArchive ? Unzip::zipArchive.get() : nullptr, false, saved.scale)
+        : init(cachedAssetPath, true, false, saved.scale);
+    while (result.has_value() && (imgData.width > saved.width || imgData.height > saved.height)) {
+        int width = 0, height = 0;
+        unsigned char *pixels = resizeRaster(static_cast<const unsigned char *>(imgData.pixels),
+                                             imgData.width, imgData.height, width, height);
+        if (!pixels) break;
+        freePixels();
+        imgData.pixels = pixels;
+        imgData.width = width;
+        imgData.height = height;
+        imgData.pitch = width * 4;
+    }
+    if (!result.has_value() || imgData.width != saved.width || imgData.height != saved.height || !imgData.pixels) {
+        freePixels();
+        imgData = saved;
+        colorDataUnavailable = true;
+        Log::logWarning("Unable to restore collision colors: " + cachedAssetPath);
+        return false;
+    }
+    // Preserve the existing texture's coordinate system and all GPU resources.
+    imgData.scale = saved.scale;
+    imgData.format = IMAGE_FORMAT_RGBA32;
+    freeTimer = maxFreeTimer;
+    Log::log("Restored collision colors: " + cachedAssetPath);
+    return true;
+}
+
 const uint8_t *Image_NV2A::getEffectSource(int &outPitch) {
     if (imgData.pixels) {
         outPitch = imgData.pitch;

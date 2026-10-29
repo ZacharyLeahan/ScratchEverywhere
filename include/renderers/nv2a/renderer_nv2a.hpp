@@ -162,6 +162,8 @@ class SE_EXPORT Renderer_NV2A : public Renderer {
 
     void renderSprites() override;
     void renderPenLayer() override;
+    void preparePenColorQuery(float minX, float minY, float maxX, float maxY) override;
+    bool samplePenColor(float x, float y, uint8_t &r, uint8_t &g, uint8_t &b, uint8_t &a) override;
 
     void drawBox(int w, int h, int x, int y, uint8_t colorR = 0, uint8_t colorG = 0, uint8_t colorB = 0, uint8_t colorA = 255) override;
     void drawRoundedBox(int w, int h, int x, int y, int radius, uint8_t colorR = 0, uint8_t colorG = 0, uint8_t colorB = 0, uint8_t colorA = 255) override;
