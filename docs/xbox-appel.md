@@ -225,3 +225,175 @@ it applies to this Appel session. The earlier diagnostic Level 1
 win is a separate result. These recordings do not extend the frame-rate
 benchmark or establish retail 64MB support. See the [capture transport limits](xbox-audio-resampling.md#capture-transport-limits--october-27)
 before interpreting long network-audio recordings as playback continuity.
+
+## Movement smoothness follow-up — candidate, October 27
+
+Direct TV feedback during normal play described movement/scrolling as less
+smooth, rather than the whole scene freezing. The earlier first-section result
+of about 30 rendered FPS does not establish fluid movement throughout the level.
+
+A new **shared-runtime candidate** removes two sources of repeated work:
+
+- List indexing checks string-only keywords through borrowed interned text.
+  Numeric terrain/collision indices no longer make a number → string → number
+  round trip. Reads, replacements, deletions and insertions retain the existing
+  conversions, bounds and random-index behavior.
+- Input/timer/broadcast hat lookups reuse their opcode strings. Missing hats
+  are looked up without inserting empty entries into every sprite/clone.
+  Matching listeners, their ordering, key-repeat and pause behavior are retained.
+
+The actual VM cases pass differential checks against the previous behavior,
+including empty/missing lists, fractional and nonfinite indices, keyword case,
+booleans/colors, random-call counts, stack state and the 200,000-item limit.
+Actual dispatch functions pass key-repeat/pause/timer/clone-listener checks.
+Both new checks use AddressSanitizer and UndefinedBehaviorSanitizer:
+
+```sh
+python3 tests/bytecode_list_index_test.py
+python3 tests/hat_dispatch_allocation_test.py
+```
+
+A host-only empty-scene test with 400 sprites and 100 input/timer/broadcast
+polls counted 80,100 allocations in the previous code and zero after warm-up in
+the candidate; absent hat maps also remain empty. A host-only numeric lookup
+microbenchmark removed 1,000,000 number-formatting calls per trial. These are
+work-count/microbenchmark results, **not Xbox FPS or whole-game speedups**.
+The numeric-cache, typed arithmetic and broadcast-index regression checks pass,
+and the normal NXDK Release build succeeds with profiling disabled. The candidate
+also boots Appel to its title screen in an isolated xemu guest, using the
+installed prepared project JSON and nonaudio assets. Audio assets were omitted
+only in that guest fixture because its BIOS exposes 64MB; this is a startup
+correctness check, not a hardware performance or audio result.
+
+The candidate preserves Appel's project, authored update rate, physics and
+audio. The physical comparison below shows an opening-area improvement.
+**Subjective movement confirmation and broader-level frame pacing remain open;
+this candidate is not a complete smoothness fix.**
+
+### Candidate gameplay regression in xemu
+
+The normal candidate (`ac3142d7…`, profiling OFF) passed a further private-guest
+check with the installed prepared project JSON and nonaudio assets. Diagnostic
+keys went through the native input and key-hat functions; no project variables,
+positions, maps or scores were written. Space press/release entered the level
+through its prepared menus. Right entered normal play, movement and jumping
+worked, and releasing jump returned the player to the ground with zero vertical
+velocity. The first apple registered.
+
+Holding Right against the first raised ledge kept the player at the same wall
+position across both observations. Right+Space then cleared it, collected the
+second apple and landed on top with zero vertical velocity. Original framebuffer
+images and read-only state snapshots support these results; the input vector was
+restored before detaching and the private guest was closed.
+
+This covers 108 diagnostic input polls through the menus and 186 in the movement
+sequence. Debugger input changes pacing: these counts are **not FPS or physical
+controller evidence**. Audio was omitted only in the guest fixture; this adds no
+audio, full-level-completion or hardware-smoothness result. Local evidence is
+`build-xbox/appel-movement-smoothness/emulator-gameplay-verification.json` and
+its referenced original images, snapshots and executed input-probe source.
+
+### Physical movement comparison, October 27
+
+On the 128MB Xbox, the matched diagnostic builds used identical frame profiling
+with thread profiling OFF. Both loaded the unchanged installed controller-menu
+v3 project (`117188ba…`), with all music/assets present. The saved v2 identity
+was stale; a full FTP readback identified v3 before installation. Its differences
+from v2 are confined to the prepared menus and their controller-mode variable.
+
+Both controlled runs began at the same first wall with one apple. Eight
+Left 1.5-second / Right 2-second cycles stayed in that opening area and ended at
+the same wall. Only normal controller reports were sent; no game state was
+read or written through a debugger. No video connection ran during either
+28-second action.
+
+| Controlled movement metric | Main baseline | Candidate |
+| --- | ---: | ---: |
+| Complete 120-frame windows | 4 (480 frames) | 6 (720 frames) |
+| Rendered FPS | 24.48 | 27.65 |
+| Mean frame period | 40.85 ms | 36.16 ms |
+| Median of window p95 periods | 68.68 ms | 52.70 ms |
+| Longest observed frame in selected windows | 185.76 ms | 166.71 ms |
+| Mean input/hat phase per rendered frame | 2.55 ms | 1.17 ms |
+| Mean script phase per rendered frame | 17.78 ms | 16.53 ms |
+
+The selection includes **every complete reporting window fully inside each
+action**, excluding partial windows at either edge. Percentiles are reported
+per 120-frame window, then their median is shown; these are not pooled frame
+percentiles. Diagnostic reporting overhead is recorded separately and excluded
+by the profiler. An earlier replay reached different apple counts/positions and
+is explicitly excluded from this comparison.
+
+This is about 13% more rendered frames per second in one short movement test,
+with fewer slow frames. The remaining long frames and roughly 53 ms window p95
+mean **it still does not establish consistently smooth movement, 60 FPS, Mac
+equivalence or whole-level performance**. Several separate event-poll stalls
+also occurred during exploratory navigation; they need further isolation.
+
+Full upload/readback verification covered separate baseline (`0071466a…`),
+candidate (`8cfba7fa…`) and normal (`ac3142d7…`) executables. The primary dashboard
+launcher (`b75e9beb…`) and installed Appel file were preserved. The normal
+candidate is installed separately at
+`F:\scratch-appel-motion-20261027\default.xbe`, with profiling and UDP diagnostics
+OFF. TV movement acceptance is still pending.
+
+Local raw evidence and the reproducible selection script are under
+`build-xbox/appel-movement-smoothness/`: `hardware-comparison-results.json`,
+`analyze-comparison.py`, both referenced UDP logs/controller receipts, start/end
+JPEGs, the full Xbox runtime logs and `hardware-comparison-install.json`.
+
+### Next pacing diagnostic
+
+The optional frame profiler now separates CPU drawing/queueing (`draw_us`) from
+the complete `SDL_RenderPresent` call (`present_us`). Presentation includes queue
+submission, GPU completion and vblank waiting; it is not a GPU-only measurement.
+`render_phases` counts how many rendered frames supplied that breakdown.
+Values remain averages per rendered frame across the same 120-frame window.
+
+Each window also reports `poll_max_us`, the number of event polls lasting at
+least one 60 Hz display interval (`slow_polls`), and frame periods exceeding
+50 or 67 ms (`over_50ms`, `over_67ms`). These expose individual stalls that an
+average poll time or average FPS can hide. All new counters reset per window.
+The host test exercises the actual profiler with multiple scheduler polls,
+different frame periods and two consecutive reporting windows:
+
+```sh
+python3 tests/xbox_frame_profile_test.py
+```
+
+This instrumentation is compiled only with `SE_XBOX_PROFILE_FRAMES=ON`.
+It does not change the simulation/update rate or the normal renderer. It was
+added after the comparison above, so those results do not contain these new
+fields. The first physical comparison exposed missing renderer build wiring:
+`render_phases`, `draw_us` and `present_us` were always zero. Those zero values
+mean the phases were not collected; the overall frame-period and scheduler
+measurements remain usable. The renderer now receives the profiling definition
+alongside the scheduler sources. Detailed tracing uses matching definitions in
+every caller. The host regression verifies shared counters across translation
+units and configures the real Xbox platform file in normal, frame-profile and
+detailed-profile modes.
+
+On October 28, separate diagnostic XBE `791bd454…` passed full FTP readback and
+two physical 28-second first-wall movement loops with the unchanged v3 project
+`117188ba…`. All ten complete 120-frame windows report `render_phases=120` and
+nonzero draw/present values; their sum stays within the broader render phase.
+There are no UDP sequence gaps in either measured interval. Video connections
+were closed during both actions; raw before/after images show the same
+one-apple/first-wall scene.
+
+The 1,200 measured frames average 27.63 FPS / 36.20 ms. Phase means are 16.11 ms
+for scripts, 3.83 ms for drawing and 9.37 ms for presentation; the median window
+p95 is 52.73 ms, with 237 frames over 50 ms and 25 over 67 ms. Presentation
+includes waits, and these window averages do not identify the phase responsible
+for each hitch. Player Three remains USB-configured with advancing completion
+counts; sampled send-error increases are 0 and 6, and receiver status ages reach
+6.01 seconds. That transport caveat remains explicit.
+
+This validates the measurement repair, not a performance improvement. Normal
+and profiling NXDK builds pass; the normal executable contains no profiler log
+string or profiling compile definitions. The primary dashboard launcher and
+project archives were not replaced. Immutable binaries/symbols, build/FTP
+receipts, original captures, closed UDP log, controller receipt and
+`physical-validation.json` are under ignored
+`build-xbox/render-phase-wiring-20261028/`. Startup/partial windows are excluded;
+the log receiver and controller were closed after the run.

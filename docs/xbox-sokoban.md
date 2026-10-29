@@ -1,5 +1,11 @@
 # Sokoban puzzle repairs
 
+Latest status (October 29): the normal texture-retirement build passes the full
+prepared set from level one through thirteen and natural wrap, with 2,728 moves
+and 628 pushes checked. Older corruption observations below concern pre-fix
+binaries. The installed Xbox archive remains the level-ten-only repair; full-set
+physical/controller and audio qualification are still open.
+
 Gammastr20's [Sokoban](https://scratch.mit.edu/projects/24490009/) has passed
 puzzles one through three on the Xbox. The downloaded tenth puzzle contains
 a crate at zero-based `(12, 2)` with inaccessible cells immediately right and
@@ -246,7 +252,7 @@ probe is under `build-xbox/sokoban-stamp-forensics-20261027/`.
 
 ### Texture-lifetime repair candidate
 
-[Draft PR #42](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/42)
+[Merged PR #42](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/42)
 localizes the redraw defect to texture storage freed before GPU reads finish.
 A standalone offline diagnostic loses a tile on draw four with unmodified main;
 the normal fixed build passes 100 unchanged draws. The selected-level-eight
@@ -255,9 +261,9 @@ physical controller restart commands with 21 clean settled board captures.
 This is rendering evidence for the separate runtime fix, not physical testing
 of this full-set archive. Native color/pen regression still reports 38 passes.
 
-A fresh full-set replay of archive `8253ed9a...` is running from normal level
+A fresh full-set replay of archive `8253ed9a...` ran from normal level
 one on fixed XBE `78cb682a...`; every map/player transition and each initial
-board's tile centers are checked. Its full result is pending. The complete
+board's tile centers were checked. Its completed result is recorded below. The complete
 image checks remain the stronger oracle for partial-tile corruption; initial
 center samples alone do not establish pixel-perfect boards. All earlier owned
 forensic guests have been closed. The installed canonical archive remains
@@ -272,7 +278,7 @@ a separately captured clean board exactly across the complete padded board
 rectangle: **0 differing pixels out of 105,910**. The first transition probe
 still displays the completed level-nine screen; it is retained separately,
 not treated as a settled level-ten failure or acceptance image. The full
-thirteen-puzzle run remains in progress, and physical full-set testing is open.
+thirteen-puzzle run now completes as recorded below; physical full-set testing is open.
 
 A separate check of the [original official Scratch player](https://scratch.mit.edu/projects/24490009/)
 produced two upward moves from a requested 400 ms key hold on level one
@@ -283,3 +289,33 @@ pacing/FPS benchmark. No source or project timing was changed. Original browser
 images/action receipts are under ignored `build-xbox/sokoban-reference-player-20261028/`;
 the complete-board comparison is `level10-complete-board-audit.json` under
 `build-xbox/sokoban-texture-fullset-20261028/` in the primary checkout.
+
+
+## Texture reuse during redraws (October 28, 2026)
+
+A separate runtime defect could leave partial or missing board stamps while
+Sokoban's map and submitted geometry were correct. The [Xbox texture-retirement
+fix](xbox-texture-retirement.md) waits for submitted GPU reads before freeing
+costume storage. The normal candidate passed 100 exact-pixel level-eight
+redraws in xemu and twenty controller restart commands with 21 clean settled
+board captures on the physical 128MB Xbox, followed by a clean browser return.
+Those selected fixtures alone do not establish a complete playthrough. The
+full-set prepared-copy hardware gate remains open; the later emulator replay
+is described below.
+
+
+## Full-set emulator follow-up (October 29, 2026)
+
+The separate `8253ed9a...` full-set candidate from
+[PR 34](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/34) now
+passes an ordinary level-one start through all thirteen puzzles and natural
+wrap to level one on the normal texture-retirement build `78cb682a...`.
+All 2,728 moves and 628 pushes were checked against independent expected
+player/map states. All thirteen initial boards passed 796 cell-center samples
+and visual review; the wrapped level-one playfield was pixel-identical across
+197,574 pixels, excluding its updated move counter. Inputs were restored.
+See the [rendering-fix validation](xbox-texture-retirement.md).
+
+The physical Xbox still has the earlier `efdbc005...` level-ten-only repair.
+This emulator result neither changes that installation nor proves controller
+transport, audio, FPS, all-thirteen full-image pixel equality, or 64MB support.

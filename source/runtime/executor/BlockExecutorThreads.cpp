@@ -36,6 +36,7 @@ uint64_t BlockExecutor::startHat(Sprite *sprite, Block *hat) {
 }
 
 std::vector<uint64_t> BlockExecutor::startBroadcastHats(std::string broadcast) {
+    static const std::string opcode = "event_whenbroadcastreceived";
 #ifdef SE_XBOX_PROFILE_THREADS
     Timer profileBroadcast;
 #endif
@@ -44,7 +45,7 @@ std::vector<uint64_t> BlockExecutor::startBroadcastHats(std::string broadcast) {
     std::vector<uint64_t> startedThreads;
     for (auto &spr : Scratch::sprites) {
         Sprite *definition = spr->cloneOriginal ? spr->cloneOriginal : spr;
-        const auto hats = definition->hats.find("event_whenbroadcastreceived");
+        const auto hats = definition->hats.find(opcode);
         if (hats == definition->hats.end() || hats->second.empty()) continue;
         const auto &matching = definition->broadcastHatIndex.lookup(broadcast, hats->second, [](Block *hat) {
             return Scratch::getFieldValue(*hat, "BROADCAST_OPTION");
@@ -223,8 +224,9 @@ void BlockExecutor::runAllBlocksByOpcode(const std::string &opcode, std::vector<
 }
 
 void BlockExecutor::runAllBlocksByOpcodeInSprite(const std::string &opcode, Sprite *sprite, std::vector<ScriptThread *> *out) {
-    if (sprite->hats[opcode].empty()) return;
-    std::vector<Block *> tempHats(sprite->hats[opcode].begin(), sprite->hats[opcode].end());
+    const auto hats = sprite->hats.find(opcode);
+    if (hats == sprite->hats.end() || hats->second.empty()) return;
+    std::vector<Block *> tempHats(hats->second.begin(), hats->second.end());
 
     for (auto it = tempHats.rbegin(); it != tempHats.rend(); ++it) {
         auto &hat = *it;

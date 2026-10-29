@@ -1,6 +1,7 @@
 #include "renderer_xbox.hpp"
 #include "speech_manager_xbox.hpp"
 #include "window_sdl3.hpp"
+#include "xbox_frame_profile.hpp"
 #include <os.hpp>
 #include <window.hpp>
 
@@ -1136,6 +1137,9 @@ void Renderer_Xbox::drawRoundedBox(int w, int h, int x, int y, int radius, uint8
 }
 
 void Renderer_Xbox::renderSprites() {
+#ifdef SE_XBOX_PROFILE_FRAMES
+    Timer profileDraw;
+#endif
     // Everything below draws to the main target; pen operations may have left the pen texture active.
     ensureMainTarget(Sdlrenderer);
 
@@ -1240,7 +1244,14 @@ void Renderer_Xbox::renderSprites() {
     }
 #endif
 
+#ifdef SE_XBOX_PROFILE_FRAMES
+    const double drawMs = profileDraw.getTimeMsDouble();
+    Timer profilePresent;
+#endif
     SDL_RenderPresent(Sdlrenderer);
+#ifdef SE_XBOX_PROFILE_FRAMES
+    XboxFrameProfile::render(drawMs, profilePresent.getTimeMsDouble());
+#endif
 #ifdef SE_XBOX_TRACE_RENDERER
     traceEffectCache();
 #endif

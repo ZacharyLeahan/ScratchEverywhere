@@ -218,3 +218,32 @@ host helpers were restored to 100ms. No runtime, firmware or KVM configuration
 was changed. Original frames and executed helper sources are retained in
 `hardware/appel-normal98-input100-42` and `input200-43` (both use the
 `appel-normal98-` prefix).
+
+## All-adapter connectivity loss during Snake (October 28 evening)
+
+Separate normal texture-retirement candidate `78cb682a...` launched the unchanged
+Snake archive/profile and passed Green Flag replay, fruit growth and a later
+Score 125 ending. An intended self-collision loop had two cells per side, so
+its eight-step perimeter exceeded the observed five-cell tail. That attempt
+does not qualify self-collision. A later Up command was not confirmed in the
+video, and neither of two subsequent Back attempts produced a visible pause.
+The last fresh screen showed the ordinary ending, not a confirmed runtime menu.
+
+The final commanded Up interval spans 619 ms with 15 raw reports, all carrying
+the Up bit; the maximum report gap is 88 ms. Cached P3 status labels Up and
+advances its send count without new send errors during that interval. This
+still does not prove receiver, USB or native-game delivery. Later all four
+routes become stale, with discovery/completion ages exceeding 127 seconds.
+Bounded read-only HTTP requests from the computer to all four known adapters
+also time out. Main-KVM system info and Xbox video remain reachable; its
+uptime continues, the Ethernet link reports 100 Mbps, and Wi-Fi reports up
+with RSSI -31. These link fields do not establish adapter connectivity.
+
+Controller clients released and closed; the read-only viewer also closed. No
+KVM firmware or settings were changed. Whether controller wiring changed is
+awaiting owner clarification; the evidence does not isolate unplugged hardware,
+network availability or a firmware cause. Original video, raw reports, cached
+routes, direct reachability results and the rejected collision route are under
+ignored `build-xbox/hardware/snake-followup-20261028/` and
+`snake-self-collision-v6-20261028-*`. Hardware pickup/self-collision and shared
+input-delivery gates remain open.
