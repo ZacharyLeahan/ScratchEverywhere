@@ -48,8 +48,25 @@ emulator checks, not physical Xbox acceptance or an all-games pass. A separately
 verified Catch run steers both ways with the left stick, reaches Score 12 /
 Timer 0, restarts on short Start at Score 0 / Timer 29, and returns to the browser.
 The earlier incorrectly selected Breakout run is retained separately and does
-not supply this Catch evidence. Game Over text has visible edge artifacts;
-rendering quality and audio remain open checks.
+not supply this Catch evidence. Audio remains an open check.
+
+A controlled Catch Game Over comparison isolates rough SVG lettering to nearest
+magnification. Switching only the native backdrop sampler to linear smooths the
+text; restoring it reproduces the original frame exactly (zero differing pixels),
+with identical uploaded texture bytes. Native SVG drawing now uses linear
+sampling across normal, tiled, mosaic, deformed and nine-slice paths. Bitmap
+textures retain their selected filtering; explicit pixelate effects use nearest.
+
+The compiled sampler candidate `c94ba467...` reaches the original Catch archive's
+natural ending at Score 11 / Timer 0. Its 175,500-pixel lettering crop matches the
+controlled linear result exactly; the backdrop texture hash is unchanged. A
+read-only trace observes 32 recognized SVG binds, all linear. Short Start replays
+at Score 0 / Timer 29, the left stick steers both ways, and Back / Return to game
+list redraws the browser. These checks exercise ordinary SVG drawing; tiled,
+mesh, pixelate and bitmap visual acceptance still need their own runtime checks.
+Both comparison guests report the standard-memory policy despite the emulator's
+128MB configuration: the backdrop raster is 334×249 in a 16-bit texture. This
+neither qualifies a retail 64MB Xbox nor proves title-visible expanded RAM.
 
 The final post-theme XBE `f79fcd52...` also reaches the native launcher twice,
 once after the controller reboot. A 90-video-frame reset hold does not reboot;

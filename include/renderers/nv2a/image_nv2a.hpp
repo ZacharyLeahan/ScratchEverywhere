@@ -28,6 +28,7 @@ class SE_EXPORT Image_NV2A : public Image {
     nonstd::expected<void, std::string> setInitialTexture();
     nonstd::expected<void, std::string> buildTiles();
     void destroyTiles();
+    NV2AScaleMode samplingMode(const NV2ATexture *activeTexture, bool pixelate = false) const;
     void renderTiled(ImageRenderParams &params);
     void renderMosaic(ImageRenderParams &params, NV2ATexture *activeTex);
     void renderPixelate(ImageRenderParams &params, NV2ATexture *activeTex);

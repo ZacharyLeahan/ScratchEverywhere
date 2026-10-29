@@ -437,6 +437,13 @@ nonstd::expected<void, std::string> Image_NV2A::buildTiles() {
     return {};
 }
 
+NV2AScaleMode Image_NV2A::samplingMode(const NV2ATexture *activeTexture, bool pixelate) const {
+    if (pixelate) return NV2AScaleMode::Nearest;
+    // Nearest magnification exposes the raster grid in anti-aliased SVG edges.
+    if (isSVGImage) return NV2AScaleMode::Linear;
+    return activeTexture ? activeTexture->scaleMode : NV2AScaleMode::PixelArt;
+}
+
 void Image_NV2A::renderTiled(ImageRenderParams &params) {
     if (tiles.empty() || !nv2aRenderer) return;
 
@@ -551,7 +558,7 @@ void Image_NV2A::renderTiled(ImageRenderParams &params) {
                 {{p_bl.first, p_bl.second}, {cr, cg, cb, ca}, {u0, v1}}
             };
 
-            nv2aRenderer->bindTexture(tile.texture, tile.texture->scaleMode);
+            nv2aRenderer->bindTexture(tile.texture, samplingMode(tile.texture, std::abs(params.pixelateEffect) > 0.001f));
             nv2aRenderer->drawTriangles(quad, 6);
         }
     };
@@ -1262,7 +1269,7 @@ void Image_NV2A::renderMosaic(ImageRenderParams &params, NV2ATexture *activeTex)
             {{p_bl.first, p_bl.second}, {255, 255, 255, alpha}, {u0, v1}}
         };
 
-        const NV2AScaleMode mosaicScaleMode = (std::abs(params.pixelateEffect) > 0.001f) ? NV2AScaleMode::Nearest : activeTex->scaleMode;
+        const NV2AScaleMode mosaicScaleMode = samplingMode(activeTex, std::abs(params.pixelateEffect) > 0.001f);
         nv2aRenderer->bindTexture(activeTex, mosaicScaleMode, /*wrap=*/true);
 
         if (brightness > 0) {
@@ -1357,7 +1364,7 @@ void Image_NV2A::renderMosaic(ImageRenderParams &params, NV2ATexture *activeTex)
         }
     }
 
-    const NV2AScaleMode mosaicScaleMode = (std::abs(params.pixelateEffect) > 0.001f) ? NV2AScaleMode::Nearest : activeTex->scaleMode;
+    const NV2AScaleMode mosaicScaleMode = samplingMode(activeTex, std::abs(params.pixelateEffect) > 0.001f);
     nv2aRenderer->bindTexture(activeTex, mosaicScaleMode, /*wrap=*/false);
     nv2aRenderer->setBlendMode(NV2ABlendMode::Blend);
     nv2aRenderer->drawTriangles(s_mosaicVerts, vertCount);
@@ -1782,7 +1789,7 @@ void Image_NV2A::renderDeformedMesh(ImageRenderParams &params, NV2ATexture *acti
         }
     }
 
-    const NV2AScaleMode meshScaleMode = (std::abs(params.pixelateEffect) > 0.001f) ? NV2AScaleMode::Nearest : activeTex->scaleMode;
+    const NV2AScaleMode meshScaleMode = samplingMode(activeTex, std::abs(params.pixelateEffect) > 0.001f);
     nv2aRenderer->bindTexture(activeTex, meshScaleMode, /*wrap=*/false);
     nv2aRenderer->setBlendMode(NV2ABlendMode::Blend);
     nv2aRenderer->drawTriangles(s_deformedVerts, vertCount);
@@ -1948,7 +1955,7 @@ void Image_NV2A::render(ImageRenderParams &params) {
             {{p_br.first, p_br.second}, {cr, cg, cb, ca}, {u1, v1}},
             {{p_bl.first, p_bl.second}, {cr, cg, cb, ca}, {u0, v1}}
         };
-        const NV2AScaleMode scaleMode = hasPixelate ? NV2AScaleMode::Nearest : activeTex->scaleMode;
+        const NV2AScaleMode scaleMode = samplingMode(activeTex, hasPixelate);
         nv2aRenderer->bindTexture(activeTex, scaleMode);
         nv2aRenderer->setBlendMode(blendMode);
         nv2aRenderer->drawTriangles(verts, 6);
@@ -2022,7 +2029,7 @@ void Image_NV2A::renderNineslice(double xPos, double yPos, double width, double 
     }
 
     if (!verts.empty()) {
-        nv2aRenderer->bindTexture(texture, texture->scaleMode);
+        nv2aRenderer->bindTexture(texture, samplingMode(texture));
         nv2aRenderer->setBlendMode(NV2ABlendMode::Blend);
         nv2aRenderer->drawTriangles(verts.data(), verts.size());
     }
