@@ -38,8 +38,9 @@ inline void poll(double ms) {
     pollMax = std::max(pollMax, ms);
     if (ms >= 1000.0 / 60.0) ++slowPolls;
 }
-// Draw measures CPU-side preparation/queueing. SDL_RenderPresent includes
-// queue submission, GPU completion and vblank waits; it is not GPU-only time.
+// Draw measures preparation/queueing, including native NV2A beginFrame waits.
+// Present measures the backend's submission/completion/presentation waits;
+// neither phase is a GPU-only measurement.
 inline void render(double draw, double present) {
     drawSum += draw;
     presentSum += present;

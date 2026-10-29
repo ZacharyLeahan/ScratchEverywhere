@@ -13,7 +13,7 @@ with tempfile.TemporaryDirectory(prefix='value-numeric-cache-') as tmp:
     (tmp/'se_export.hpp').write_text('#pragma once\n#define SE_EXPORT\n')
     (tmp/'os.hpp').write_text('#pragma once\n')
     (tmp/'renderer.hpp').write_text('''#pragma once
- enum class Renderers { SDL1, SDL2, SDL3, Xbox, GX2, OpenGL, OpenGLCore, GDI, D3D9, Headless };
+ enum class Renderers { SDL1, SDL2, SDL3, Xbox, NV2A, GX2, OpenGL, OpenGLCore, GDI, D3D9, Headless };
  namespace Render { inline Renderers currentRenderer = Renderers::Headless; }
 ''')
     (tmp/'log.hpp').write_text('''#pragma once

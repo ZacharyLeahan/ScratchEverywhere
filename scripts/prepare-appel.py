@@ -2,7 +2,8 @@
 """Add controller menu navigation to a separate Appel v1.4 copy.
 
 Preserves assets and gameplay scripts. A/Space activates the focused title
-item or selected level on release; arrows navigate and B returns from levels.
+item, selected level or victory action on release; arrows navigate and B returns
+from levels. Victory actions use the original in-game menu procedure.
 """
 import argparse
 import copy
@@ -111,7 +112,113 @@ def prepare(project):
         for value in block.get('inputs', {}).values():
             if len(value) > 1 and isinstance(value[1], str) and value[1].startswith('xbox-menu-'):
                 blocks[value[1]]['parent'] = key
+    _prepare_victory_menu(project, stage)
     return project
+
+
+def _prepare_victory_menu(project, stage):
+    """Route victory focus through the authored show-menu action procedure."""
+    menu = next(t for t in project['targets'] if t['name'] == 'in-game menu')
+    blocks = menu['blocks']
+    focus = 'xbox-victory-focus'
+    stage['variables'][focus] = ['Xbox victory selection', 1]
+    variables = {v[0]: k for k, v in stage['variables'].items()}
+    local = {v[0]: k for k, v in menu['variables'].items()}
+    number = 0
+
+    def add(op, inputs=None, fields=None, next=None, **extra):
+        nonlocal number
+        number += 1
+        key = 'xbox-victory-' + str(number)
+        blocks[key] = dict(opcode=op, next=next, parent=None, inputs=inputs or {},
+                           fields=fields or {}, shadow=False, topLevel=False, **extra)
+        return key
+
+    def literal(v): return [1, [10, str(v)]]
+    def ref(v): return [2, v]
+    def var(name): return [3, [12, name, local.get(name, variables.get(name))], [10, '']]
+    def eq(a, b): return add('operator_equals', {'OPERAND1': a, 'OPERAND2': b})
+    def both(a, b): return add('operator_and', {'OPERAND1': ref(a), 'OPERAND2': ref(b)})
+    def either(a, b): return add('operator_or', {'OPERAND1': ref(a), 'OPERAND2': ref(b)})
+    def identity(v): return eq(var('id'), literal(v))
+    def selected(n): return eq(var('Xbox victory selection'), literal(n))
+    def winning():
+        active = add('operator_gt', {'OPERAND1': var('IN-GAME MENU'), 'OPERAND2': literal(0)})
+        return both(eq(var('GAME STATE'), literal('WIN')), active)
+    def controller_ready():
+        white = add('sensing_keyoptions', fields={'KEY_OPTION': ['l', None]})
+        pressed = add('sensing_keypressed', {'KEY_OPTION': [1, white]})
+        return both(winning(), add('operator_not', {'OPERAND': ref(pressed)}))
+    def keyboard():
+        return both(controller_ready(), eq(var('Xbox controller menus'), literal(1)))
+    def pointer(): return add('operator_not', {'OPERAND': ref(keyboard())})
+    def allowed():
+        choices = [both(identity(name), selected(n)) for n, name in enumerate(
+            ['Continue3', 'Try Again', 'Level Select', 'Replay'], 1)]
+        match = choices[0]
+        for choice in choices[1:]: match = either(match, choice)
+        return both(controller_ready(), match)
+    def setvar(name, value, next=None):
+        return add('data_setvariableto', {'VALUE': value},
+                   {'VARIABLE': [name, variables[name]]}, next)
+    def setmode(value, next=None):
+        return setvar('Xbox controller menus', literal(value), next)
+    def condition(test, body, next=None):
+        return add('control_if', {'CONDITION': ref(test), 'SUBSTACK': ref(body)}, next=next)
+    def hat(key, body):
+        h = add('event_whenkeypressed', fields={'KEY_OPTION': [key, None]}, next=body)
+        blocks[h].update(topLevel=True, x=8000, y=3000 + number)
+
+    # Clones handle A only when their own authored button is selected. Recheck
+    # after release so a menu change or focus move cannot activate an old choice.
+    original_call = next(b for b in blocks.values() if b['opcode'] == 'procedures_call'
+                         and b.get('mutation', {}).get('proccode') == 'show menu')
+    action = add('procedures_call', copy.deepcopy(original_call['inputs']),
+                 copy.deepcopy(original_call['fields']),
+                 mutation=copy.deepcopy(original_call['mutation']))
+    keymenu = add('sensing_keyoptions', fields={'KEY_OPTION': ['space', None]})
+    pressed = add('sensing_keypressed', {'KEY_OPTION': [1, keymenu]})
+    released = add('operator_not', {'OPERAND': ref(pressed)})
+    wait = add('control_wait_until', {'CONDITION': ref(released)},
+               next=condition(allowed(), action))
+    hat('space', condition(allowed(), setmode(1, wait)))
+
+    # The hidden original alone moves global focus; button clones cannot multiply
+    # each key press. Up/down cycle all four choices; left/right cross the last row.
+    for key, delta in [('up arrow', -1), ('down arrow', 1)]:
+        value = add('operator_add', {'NUM1': var('Xbox victory selection'), 'NUM2': literal(delta + 3)})
+        wrap = add('operator_mod', {'NUM1': [3, value, [4, '0']], 'NUM2': literal(4)})
+        onebased = add('operator_add', {'NUM1': [3, wrap, [4, '0']], 'NUM2': literal(1)})
+        change = setvar('Xbox victory selection', [3, onebased, [4, '1']])
+        hat(key, condition(both(controller_ready(), identity('')), setmode(1, change)))
+    for key, current, target in [('left arrow', 4, 3), ('right arrow', 3, 4)]:
+        change = condition(selected(current), setvar('Xbox victory selection', literal(target)))
+        hat(key, condition(both(controller_ready(), identity('')), setmode(1, change)))
+
+    # Keep the authored pointer path for every other menu and mouse mode. In
+    # controller mode only the selected victory clone may highlight; a stale
+    # pointer cannot highlight or click a second button.
+    vertical = blocks['X|iW.r0pMOpcby0vVm+8']
+    horizontal = blocks['2p^0iQn$a`QmovdGC*!Z']
+    mouse_press = blocks['cupJLhn*zW+h:$r2KN/Z']
+    old_vertical = vertical['inputs']['CONDITION'][1]
+    old_horizontal = horizontal['inputs']['CONDITION'][1]
+    old_press = mouse_press['inputs']['CONDITION'][1]
+    vertical['inputs']['CONDITION'] = ref(either(both(keyboard(), allowed()), both(pointer(), old_vertical)))
+    horizontal['inputs']['CONDITION'] = ref(either(keyboard(), both(pointer(), old_horizontal)))
+    mouse_press['inputs']['CONDITION'] = ref(both(pointer(), old_press))
+
+    setup_key, setup = next((k, b) for k, b in blocks.items() if b['opcode'] == 'procedures_definition'
+                           and blocks[b['inputs']['custom_block'][1]].get('mutation', {}).get('proccode')
+                           == 'clone level complete menu')
+    setup['next'] = setmode(1, setvar('Xbox victory selection', literal(1), setup['next']))
+    blocks[setup['next']]['parent'] = setup_key
+    for key, block in list(blocks.items()):
+        if not key.startswith('xbox-victory-'): continue
+        if block.get('next'): blocks[block['next']]['parent'] = key
+        for value in block['inputs'].values():
+            if len(value) > 1 and isinstance(value[1], str) and value[1] in blocks:
+                blocks[value[1]]['parent'] = key
 
 
 def main():

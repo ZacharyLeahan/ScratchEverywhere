@@ -149,7 +149,10 @@ std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayTh
 #endif
         BlockExecutor::runThreads();
         BytecodeExecutor::runThreads();
+        // Bytecode can retire clones after the legacy executor's cleanup pass.
+        BlockExecutor::cleanupSprites();
         XboxVariableWatch::sample();
+        Mixer::drainRetiredStreams();
 #ifdef SE_XBOX_PROFILE_FRAMES
         const double profileScripts = profilePhase.getTimeMsDouble();
         XboxFrameProfile::work(profileInput, profileScripts);
@@ -270,6 +273,10 @@ void Scratch::stopClicked() {
         currentSprite->ghostEffect = 0.0f;
         currentSprite->brightnessEffect = 0.0f;
         currentSprite->colorEffect = 0.0f;
+        currentSprite->fisheyeEffect = 0.0f;
+        currentSprite->whirlEffect = 0.0f;
+        currentSprite->pixelateEffect = 0.0f;
+        currentSprite->mosaicEffect = 0.0f;
         for (Sound sound : currentSprite->sounds)
             Mixer::stopSound(sound.fullName);
     }
