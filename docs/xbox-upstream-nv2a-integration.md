@@ -328,6 +328,31 @@ suppresses loss UI/sound at score seven. See the [full-round evidence and
 caveat](xbox-frogger.md#native-emulator-full-round--october-29-2026).
 Physical seven-pad victory/replay, audio, pacing and 64 MB gates remain open.
 
+## All 21 native browser launch/exit checks — October 29
+
+One private snapshot guest on unchanged native `807d1928...` selects and loads
+all 21 normal manifest entries through emulated USB D-pad/A input. Read-only
+checks match each selected entry to the actual loaded archive path. Each game
+subsequently pauses and exits; all 21 returns leave zero game sprites, the exact
+21-file browser list and 42 game/settings buttons, with renderer/window 3/0.
+No wrong-game launch, guest reboot or save-state restore occurs in this cycle.
+Some loaded captures are title screens; this is launcher coverage, not complete
+gameplay qualification.
+
+Mario's first short Back press during the Will_Wam intro does **not** open pause.
+After another 600 neutral video frames, its controls scene appears; the same
+short Back press then opens pause and Exit succeeds. The missed early press is
+retained as an open startup/input timing check, not dismissed as a crash or
+counted as uniform first-attempt pause success. The helper's earlier loading-flag
+and empty-string observation errors are also retained; neither required an
+engine or project change.
+
+Evidence is in `build-xbox/native-browser-all21-20261029/review.json`, the per-entry
+selected/loaded/pause/returned receipts and screenshots, and the QMP logs.
+The guest exits cleanly; all 41 normal source files and the saved shared HDD
+remain byte-identical. Physical controls/handoff, full gameplay, audio, pacing
+and retail 64 MB acceptance remain open.
+
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
 texture/pen behavior, and continue every open gate in the
