@@ -213,9 +213,9 @@ samples or zero 256-sample blocks. The full original completion cue matches
 at correlation 0.943; this bounded comparison does not establish every cue or
 physical TV sound. A fresh browser launch also reaches Appel's title and exits,
 but that private HDD fixture lacks the controller-menu variables and is excluded
-from prepared-copy relaunch acceptance. Refresh that fixture before repeating
-prepared-copy browser launch. Physical Level One/replay, pacing, audio and the
-other hardware qualification gates remain open.
+from prepared-copy relaunch acceptance. The later fixture refresh below closes
+that emulator-only relaunch gap. Physical Level One/replay, pacing, audio and
+the other hardware qualification gates remain open.
 
 ## Appel victory controller menus
 
@@ -238,8 +238,31 @@ navigation, pointer fallback, cancellation, A hold/release, real Try Again reset
 and renewed jumping, Level Select, Continue to the next level, Replay activation
 and launcher return. It seeds WIN for this bounded menu test and does not prove
 a natural v4 victory or complete recorded-run playback. The earlier 21-apple
-natural victory belongs to the unchanged v3 archive. Normal v4 deployment and
-physical controller/menu acceptance remain pending.
+natural victory belongs to the unchanged v3 archive. Physical v4 deployment
+and controller/menu acceptance remain pending.
+
+## Refreshed 21-game emulator fixtures — October 29
+
+A new private HDD copy now contains all 21 normal games, with current prepared
+copies and 20 controller sidecars; Ultra Bird uses the default controls. All 41
+files pass full FTP readback. Appel uses the normal v4 `6ccd3f17...` candidate,
+not the WIN-seeded fixture. Sokoban retains installed `efdbc005...`; the separate
+full-set candidate is not substituted. Backups use `.fixture` extensions.
+
+On unchanged native `807d1928...`, Appel passes two controller-only browser →
+title → level picker → Level One → browser cycles, including Right/A movement,
+jumping and the first apple. Read-only inspection confirms the prepared menu
+variables. Spider Adventure is selectable as game 21, reaches natural Game Over,
+accepts Y replay and Right/A jumping, and returns to the populated browser.
+These short checks do not establish Spider's ten-level victory.
+
+Read-only browser inspection matches all 21 manifest names and 42 game/settings
+buttons, with renderer/window 3/0. A separate cold-started snapshot guest repeats
+that exact list check and leaves the saved HDD byte-identical. Evidence is in
+`build-xbox/emulator-game-refresh-20261029/review.json` and its linked receipts
+and captures. Both guests exit cleanly with neutral controls. This refresh changes
+only the private emulator fixtures; physical installation, Appel v4 natural
+victory/replay, pacing/audio and every open hardware gate remain pending.
 
 Before merging: verify the native backend and the intended saved renderer choice
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
