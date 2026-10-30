@@ -229,3 +229,8 @@ cache dependency on `Image_Xbox` and SDL headers. Use the documented dual-backen
 configuration (`SE_RENDERER=all`, `SE_WINDOWING=all`, `SE_AUDIO_ENGINE=all`)
 for this validation. Native Xbox audio returns -1 for an unsupported microphone.
 No console deployment or new hardware acceptance is implied by this sync.
+
+The dual-backend NXDK Release build passed with forced 480p, native allocator,
+and frame/thread profiling disabled. The resulting `build-xbox/default.xbe`
+SHA-256 is `eb3492c2b7149a14200d02486a5d12b95cf886ebdb26655c255ac5f738a24535`.
+Build logs are retained locally in `/tmp/upstream-sync-20261030-build-all.log`.
