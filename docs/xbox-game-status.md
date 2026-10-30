@@ -1,4 +1,4 @@
-# Xbox game status — October 29, 2026
+# Xbox game status — October 30, 2026
 
 [Main](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/tree/main) is the
 place to find current code. This page summarizes what we have actually tested;
@@ -22,6 +22,12 @@ each return. Some launches stop at a title screen. **That common check does not
 prove full gameplay, smoothness or audio.** “Launch cycle” below means this
 limited check; larger emulator objectives are listed separately.
 
+After the October 30 upstream sync, normal main build `eb3492c2…` repeats all
+21 native-emulator launch/pause/Exit cycles in one snapshot guest, with the exact
+21-game/42-button browser and zero game sprites after every return. This is the
+[same limited check](xbox-upstream-nv2a-integration.md#current-main-launch-regression--october-30),
+not a new physical or complete-gameplay pass.
+
 | Game / detailed notes | Real Xbox result | Extended emulator result | Open gameplay / quality checks |
 | --- | --- | --- | --- |
 | [Spider Adventure](xbox-spider-adventure.md) | Level 6; Score 7,516; death, replay and relaunch | All 10 levels / 100 spiders; Score 14,110; victory replay | Full hardware victory; longer audio/listening |
@@ -34,7 +40,7 @@ limited check; larger emulator objectives are listed separately.
 | [Tetris](xbox-tetris.md) | Ten-line/level-up runs; later four-line objective at 1,200; top-out/replay | Independent ordinary four-line run; cap ending checked with seeded diagnostic | Subjective audio; initial capture anomaly; cap is not a natural full playthrough |
 | [Frogger](xbox-frogger.md) | Six pads in one round; all seven positions across rounds; replay/relaunch | All seven in one native round; visible Win, replay and ordinary loss | Hardware seven-pad win/replay; audio. Emulator ending has internal alive=0 despite authored Win |
 | [Breakout](xbox-breakout-controller.md) | Final prepared copy clears board at 1,940; replay and fresh-launch/exit checks | Native board clear at 1,920 / three lives; replay | KVM paddle delivery; faint scaled boundary line; no authored playback |
-| [PacMan](xbox-pacman.md) | Turns/walls/scoring; power pellet +100 and blue ghosts; loss/replay | All 92 collectibles plus one ghost: 1,380; visible Win; Win/loss replay | Hardware full board/ghost; final High Score 1,370 versus Score 1,380, cause unresolved |
+| [PacMan](xbox-pacman.md) | Turns/walls/scoring; power pellet +100 and blue ghosts; loss/replay | All 92 collectibles plus one ghost: 1,380; visible Win; Win/loss replay | Hardware full board/ghost; original final High Score gap; optional prepared repair passes ending probes and natural loss/replay, not installed |
 | [Space Invaders](xbox-space-invaders.md) | Score 1,230; shield/life loss, replay/relaunch | Native full wave: 55 → 0 → fresh 55, Score 990 / three lives; wave-two recovery | Hardware full wave; complete audio/listening |
 | Asteroids ([checklist](xbox-game-qualification.md)) | Thrust/turn/fire; Score 9,200; Game Over/replay/relaunch | Launch cycle | Further level progression; audio |
 | [Sokoban](xbox-sokoban.md) | Puzzles 1–3; repaired puzzle 10 complete; restart/relaunch | Optional full-set copy: all 13 puzzles, 2,728 moves / 628 pushes, natural wrap; SDL renderer | Full-set copy not installed on hardware; physical full set and native gameplay/audio |
@@ -78,9 +84,12 @@ and continuity checks remain open where the table says audio.
   recovered to XBMC; an earlier hold exactly at the two-second threshold did not.
   It cannot guarantee recovery from a hard hang or disconnected adapter. Native
   Back taps are retained across slow polls, but a slow render can still delay pause.
-- PacMan's last ten points can be missing from High Score. Numeric monitor
-  decimal tails have a separate [formatter fix](xbox-monitor-number-formatting.md);
-  pre-existing JSON number-loading precision is still unresolved.
+- The original PacMan can miss its final High Score update. An optional
+  [prepared-project repair](xbox-pacman.md#optional-final-high-score-repair--october-30-2026)
+  now passes isolated ending probes and normal loss/replay in xemu; the physical
+  archive is unchanged. Numeric monitor decimal tails have a separate
+  [formatter fix](xbox-monitor-number-formatting.md); pre-existing JSON
+  number-loading precision is still unresolved.
 - There is a local game browser, but no in-app Scratch search/download/add flow.
   Projects and any control sidecars must be downloaded externally and FTP'd to
   `E:\ScratchEverywhere\` while XBMC provides FTP, then opened from the game list.

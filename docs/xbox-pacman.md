@@ -127,3 +127,45 @@ Ignored evidence: `build-xbox/pacman-native-board-20261029/review.json`,
 `project-regressions.json`, `win-silence.json`, original screenshots and QMP logs.
 Physical frightened-ghost/full-board/replay, native rendering, pacing and 64 MB
 gates remain open. These emulator images do not satisfy the real-Xbox GIF request.
+
+## Optional final high-score repair — October 30, 2026
+
+The original updates High Score in a separate forever loop. Win and Game Over
+stop every script, so the last score change can be missed. This is a
+**prepared-project repair**, not an Xbox renderer or shared-runtime change.
+[The preparation script](../scripts/prepare-pacman.py) updates the record before
+each ending while preserving a higher existing record:
+
+```sh
+python3 scripts/prepare-pacman.py PacMan-cdaniels7088.sb2 PacMan-fixed.sb2
+```
+
+The tool requires the original `283feafd…` archive and refuses to overwrite
+an existing output. Only two guards in the stage's ending handlers are added;
+all assets, credits, controls and other project data are preserved. A separately
+named test copy needs the existing arrow-control sidecar copied to its new
+archive name, e.g. `PacMan-fixed.sb2.json`. This does not add disk persistence
+for High Score.
+
+On normal current-main XBE `eb3492c2…`, native renderer/window 3/0, paired
+**diagnostic ending fixtures** reproduce original Win **1,380 / 1,370** and show
+prepared Win **1,380 / 1,380**. Loss **80 / 70 → 80 / 80** and preservation of a
+higher record (**80 / 200**) also pass: six runtime cases plus twelve host cases.
+These fixtures preset scores and disable other project threads to isolate the
+ending handlers; they are not natural board clears or real-Xbox evidence.
+
+The full prepared archive `fc4cea990e6a99978a4aaac3f2ad7d5b0a028b5807e2e937f00c4f4786188487`
+also passes three fresh DVD loads, ordinary USB Right movement/pellet collection
+and three clean browser returns. A normal Right → Up route reaches natural
+Game Over at Score 20. Short Start restores Score/Dots zero, retains High Score
+20, and renewed Right collects two dots for Score 20. Read-only debugger
+observations verify these values; only the initial DVD path/backend are selected
+in the debugger. No mid-round score, position, RNG or thread-state writes are
+used in these full-project checks.
+
+The prepared archive has not been uploaded to the physical Xbox. Installation, a natural full
+board on the prepared copy, physical win/loss/replay and audio/performance gates
+remain open. Ignored evidence is under
+`build-xbox/native-qualification-20261030/`: `pacman-archive-audit.json`,
+`pacman-ending-probes/review.json`, the three normal-copy reviews, screenshots,
+QMP/GDB journals and `final-review.json`.
