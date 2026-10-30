@@ -207,3 +207,30 @@ At this sync checkpoint the regular Games launcher remains the preceding
 was changed. Build/dependency manifests, decoder probes, and hardware evidence
 are retained under ignored `build-xbox/upstream-wiiu-audio-20261027` and
 `build-xbox/hardware/upstream-wiiu-*` paths.
+
+## Upstream synchronization (October 30, 2026)
+
+Merged upstream `main` through
+[`59057691`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/59057691)
+from fork main `d35d77e7`. This imports eleven upstream commits after `ec2400eb`,
+including microphone/loudness support, the NV2A effect-cache allocation retry,
+NDS audio/assets fixes, PSP SDL3 migration and other platform build fixes.
+The merge preserves the complete fork history and all existing Xbox/game work;
+`backup/pre-upstream-20261030` retains the previous main locally. Existing
+unmerged feature branches remain separate and unchanged.
+
+The host event-dispatch harness now provides the new loudness dependency and
+checks unavailable microphones and rising threshold crossings. Audio resampling
+(160 streaming cases plus EOF/gain/pitch/reset), hat dispatch/allocation,
+typed arithmetic/logic bytecode and costume-cache lifetime checks passed.
+
+A native-only renderer configuration exposed the existing cross-renderer texture
+cache dependency on `Image_Xbox` and SDL headers. Use the documented dual-backend
+configuration (`SE_RENDERER=all`, `SE_WINDOWING=all`, `SE_AUDIO_ENGINE=all`)
+for this validation. Native Xbox audio returns -1 for an unsupported microphone.
+No console deployment or new hardware acceptance is implied by this sync.
+
+The dual-backend NXDK Release build passed with forced 480p, native allocator,
+and frame/thread profiling disabled. The resulting `build-xbox/default.xbe`
+SHA-256 is `eb3492c2b7149a14200d02486a5d12b95cf886ebdb26655c255ac5f738a24535`.
+Build logs are retained locally in `/tmp/upstream-sync-20261030-build-all.log`.

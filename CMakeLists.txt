@@ -282,11 +282,21 @@ set(CMAKE_FIND_LIBRARY_CUSTOM_LIB_DIRS OFF)
 
 # Copy graphics files to romfs
 if(SE_MENU)
-    file(GLOB_RECURSE GFXFILES
-        "${CMAKE_CURRENT_SOURCE_DIR}/gfx/menu/*"
-        "${CMAKE_CURRENT_SOURCE_DIR}/gfx/ingame/*"
-        "${CMAKE_CURRENT_SOURCE_DIR}/gfx/translations/*"
-    )
+    if(NINTENDO_DS)
+        file(GLOB_RECURSE GFXFILES
+            "${CMAKE_CURRENT_SOURCE_DIR}/gfx/menu/*"
+            "${CMAKE_CURRENT_SOURCE_DIR}/gfx/ingame/*"
+            "${CMAKE_CURRENT_SOURCE_DIR}/gfx/translations/*"
+            "${CMAKE_CURRENT_SOURCE_DIR}/gfx/nds/mm_ds.wav"
+        )
+    else()
+        file(GLOB_RECURSE GFXFILES
+            "${CMAKE_CURRENT_SOURCE_DIR}/gfx/menu/*"
+            "${CMAKE_CURRENT_SOURCE_DIR}/gfx/ingame/*"
+            "${CMAKE_CURRENT_SOURCE_DIR}/gfx/translations/*"
+        )
+    endif()
+
 else()
     if(NINTENDO_DS)
         file(GLOB_RECURSE GFXFILES
@@ -578,9 +588,9 @@ if(SE_AUDIO)
     target_link_libraries(se-interface INTERFACE audio_interface)
     if(NOT NINTENDO_DS)
         cl_add_dep(se-interface stb_vorbis)
+        cl_add_dep(se-interface tsf)
     endif()
     cl_add_dep(se-interface dr_libs)
-    cl_add_dep(se-interface tsf)
 endif()
 
 if(SE_ALLOW_NATIVE_EXTENSIONS)
