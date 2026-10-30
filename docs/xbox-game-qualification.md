@@ -3,6 +3,8 @@
 For a short current summary of hardware versus emulator results, measured
 performance and known issues, see [Xbox game status](xbox-game-status.md).
 This checklist retains the detailed physical acceptance gates.
+The latest [native hardware follow-up](xbox-native-hardware-followup.md) covers
+normal-main Catch gameplay, recovery and the still-open startup investigation.
 Older sections describe their then-current builds, including historical lwmem
 checks; current upstream removes the Xbox lwmem override. Use the
 [current build guide](xbox-fork-build.md) for main.

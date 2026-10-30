@@ -134,3 +134,16 @@ browser without launching it. Original frames are
 `catch-canonical-brown1-20261028-frames/` and
 `catch-canonical-final-browser-20261028.jpg`. These two successful exits do
 not establish that the earlier intermittent handoff defect is fixed.
+
+## Current main, native hardware follow-up — October 29
+
+Normal diagnostics-off main build `207edc25…` now has a physical NV2A result on
+the 128 MB Xbox: normal browser selection, Score 13 / Timer 0 Game Over, short
+Start replay to 0/30, recorded D-pad Right and Left with renewed scoring, Back
+pause, and one clean held-confirmation Exit. The original 148-frame replay clip
+spans 6.82 seconds; it is not a game-FPS measurement. A separate Left press
+after expiry is excluded. Repeated handoff and audio acceptance remain open.
+
+See the [backend/startup evidence and limits](xbox-native-hardware-followup.md).
+A separate framebuffer-initialization experiment was discarded; this result
+uses unchanged main, and does not close the 21-game hardware goal.

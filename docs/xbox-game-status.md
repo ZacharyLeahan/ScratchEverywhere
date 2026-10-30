@@ -5,11 +5,14 @@ place to find current code. This page summarizes what we have actually tested;
 the [hardware checklist](xbox-game-qualification.md) and linked game notes keep
 the detailed evidence. **The 21-game hardware qualification is incomplete.**
 
-The physical console has **128 MB RAM**. Its latest test launcher uses the older
-SDL Xbox renderer. The new native NV2A renderer, Xbox audio and controller
-integration have extensive emulator coverage but still need physical testing.
-Merging code does not replace the console's installed executable, game archives
-or saved renderer preference. Retail 64 MB support is unverified.
+The physical console has **128 MB RAM**. A separate normal build of main now
+passes native NV2A browser selection, Catch Apples ending/replay/steering and one
+clean return to the game list. Native startup reliability and the other twenty
+games still need current-build hardware checks; see the
+[physical backend follow-up](xbox-native-hardware-followup.md). The installed
+primary dashboard launcher still uses the older SDL Xbox renderer. Merging code
+does not replace it, game archives or saved renderer preferences. Retail 64 MB
+support is unverified.
 
 ## Gameplay coverage
 
@@ -24,7 +27,7 @@ limited check; larger emulator objectives are listed separately.
 | [Spider Adventure](xbox-spider-adventure.md) | Level 6; Score 7,516; death, replay and relaunch | All 10 levels / 100 spiders; Score 14,110; victory replay | Full hardware victory; longer audio/listening |
 | [Hopper Heros](xbox-hopper.md) | Movement/jump; Score 8; loss/replay and relaunch | Launch cycle | Sustained progression; early short Start sometimes missed; audio |
 | [Ultra Bird](xbox-ultra-bird.md) | Six pipes / Score 6; loss/replay; repeated launch/exit | Launch cycle | Controller delivery; no authored sound |
-| [Catch Apples](xbox-catch-apples.md) | Score 22 / timer expiry; replay; special-apple scores repaired | Native timer ending, replay, steering and return | Historical Exit → 2048 handoff needs current hardware repeat; audio |
+| [Catch Apples](xbox-catch-apples.md) | Score 22 / timer expiry; replay; special-apple scores repaired; current main native Score 13 ending, replay, both D-pad directions and one clean Exit | Native timer ending, replay, steering and return | Further repeated native handoff checks; historical Exit → 2048; audio |
 | [Maze Starter](xbox-maze-replay.md) | Complete maze, wall blocking, repeated clean replay | Launch cycle | Shared browser/controller handoff; no authored sound |
 | [Snake](xbox-snake.md) | Score 225 tail-collision ending; blade shrink, clock slowdown/restoration; replay | Launch cycle | Latest second Exit interrupted by adapter disconnects; active audio |
 | [Appel](xbox-appel.md) | Normal play to 21/35 apples, checkpoints/death; earlier diagnostic Level 1 win; TV music reported clean | Normal v4 Level 1 win: 17 apples / 1:07.8; complete authored replay; Try Again | Movement smoothness; normal-v4 physical win/replay; later levels; audio continuity |
@@ -61,15 +64,20 @@ and continuity checks remain open where the table says audio.
 
 ## Shared issues and how to add games
 
-- KVM controller adapters intermittently go offline or deliver late/duplicate
-  input. The last recovery check at 14:35 UTC on October 29 had Player One stale,
-  dashboard FTP unreachable and a Snake pause-menu image in the feed. This prevents reliable
-  further physical automation; it does not establish a game crash.
+- KVM controller adapters have intermittently gone offline or delivered
+  late/duplicate input. After reconnecting only Player One, the latest native
+  Catch and controller-reset checks completed. The other three adapters remain
+  deliberately disconnected; this is not a four-player retest.
+- Native startup has shown purple in short captures. A longer capture also
+  reaches the browser on unchanged main, so neither a permanent freeze nor a
+  renderer fix is established by those early images. Repeated, adequately
+  observed starts remain open; see the [follow-up](xbox-native-hardware-followup.md).
 - Return to launcher, short Start replay of stopped projects, and
   **Start + Back + both triggers held two seconds** are implemented. The reset
-  requests Xbox reboot while the game loop responds; it cannot guarantee recovery
-  from a hard hang or disconnected adapter. Native Back taps are retained across
-  slow polls, but a slow render can still delay pause.
+  requests Xbox reboot while the game loop responds. A three-second test hold
+  recovered to XBMC; an earlier hold exactly at the two-second threshold did not.
+  It cannot guarantee recovery from a hard hang or disconnected adapter. Native
+  Back taps are retained across slow polls, but a slow render can still delay pause.
 - PacMan's last ten points can be missing from High Score. Numeric monitor
   decimal tails have a separate [formatter fix](xbox-monitor-number-formatting.md);
   pre-existing JSON number-loading precision is still unresolved.
@@ -83,7 +91,8 @@ and continuity checks remain open where the table says audio.
 
 - [PR 43](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/43): upstream
   Xbox integration, native graphics/input fixes and Appel controller-menu updates;
-  **physical native-backend acceptance remains open**.
+  [limited native hardware follow-up](xbox-native-hardware-followup.md) now exists;
+  **full physical native-backend acceptance remains open**.
 - [PR 41](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/41): shared
   numeric monitor formatter repair, verified with Xbox compiler flags and paired
   emulator probes; physical confirmation remains open.
