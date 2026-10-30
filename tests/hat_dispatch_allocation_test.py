@@ -33,6 +33,10 @@ struct Sprite {
 };
 struct ScriptThread {};
 struct Timer { double getTimeMs() { return 1000; } };
+struct SoundPlayer {
+    inline static int loudness = -1;
+    static int getLoudness() { return loudness; }
+};
 namespace Input {
 std::unordered_map<std::string,int> keyHeldDuration;
 std::vector<std::string> inputKeys, inputBuffer;
@@ -114,6 +118,22 @@ int main() {
     assert(BlockExecutor::started.size()==2);
     BlockExecutor::resetWhenGreaterThanHats();
 
+    Block loudnessHat{"loudness","",10};
+    keyboard.hats["event_whengreaterthan"]={&loudnessHat};
+    BlockExecutor::started.clear();
+    BlockExecutor::executeWhenGreaterThanHats();
+    assert(BlockExecutor::started.empty()); // unavailable microphone (-1)
+    SoundPlayer::loudness=11;
+    BlockExecutor::executeWhenGreaterThanHats();
+    BlockExecutor::executeWhenGreaterThanHats();
+    assert(BlockExecutor::started.size()==1); // rising edge only
+    SoundPlayer::loudness=10;
+    BlockExecutor::executeWhenGreaterThanHats();
+    SoundPlayer::loudness=12;
+    BlockExecutor::executeWhenGreaterThanHats();
+    assert(BlockExecutor::started.size()==2);
+    BlockExecutor::resetWhenGreaterThanHats();
+
     // Warming a large scene must not populate absent hats or allocate keys on
     // subsequent empty input polls/broadcast misses. Assert allocation count,
     // not a timing threshold dependent on the host machine.
@@ -130,7 +150,7 @@ int main() {
     }
     assert(allocations==before);
     for(auto &s:empty) assert(s.hats.empty());
-    std::cout<<"PASS: actual key/repeat/pause/timer hats, clone broadcasts/order; 400 sprites x 100 empty polls with zero allocations or inserted hats\n";
+    std::cout<<"PASS: actual key/repeat/pause/timer/loudness hats, clone broadcasts/order; 400 sprites x 100 empty polls with zero allocations or inserted hats\n";
 }
 ''')
     subprocess.run(['c++','-std=c++17','-O2','-fsanitize=address,undefined','-I'+str(root/'include/runtime'),str(tmp/'test.cpp'),'-o',str(tmp/'test')],check=True)
