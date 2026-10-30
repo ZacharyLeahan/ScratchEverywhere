@@ -234,3 +234,12 @@ The dual-backend NXDK Release build passed with forced 480p, native allocator,
 and frame/thread profiling disabled. The resulting `build-xbox/default.xbe`
 SHA-256 is `eb3492c2b7149a14200d02486a5d12b95cf886ebdb26655c255ac5f738a24535`.
 Build logs are retained locally in `/tmp/upstream-sync-20261030-build-all.log`.
+
+### Checking the disc image used for testing
+
+When the build cache sets `EXTRACT_XISO_BIN=OFF`, a successful build updates the
+XBE without regenerating `scratch-xbox.iso`; an older ISO may still be present.
+Check the disc's embedded `default.xbe` against the executable under test before
+using matching debugger symbols. The October 30 native regression uses a fresh
+separate image with complete embedded-XBE byte comparison, not the stale primary
+ISO. This does not change the cache's intentional packaging setting.

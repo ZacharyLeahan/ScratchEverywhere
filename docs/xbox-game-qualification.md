@@ -3,6 +3,9 @@
 For a short current summary of hardware versus emulator results, measured
 performance and known issues, see [Xbox game status](xbox-game-status.md).
 This checklist retains the detailed physical acceptance gates.
+The [October 30 native launch regression](xbox-upstream-nv2a-integration.md#current-main-launch-regression--october-30)
+repeats the common 21-game emulator cycle after the latest upstream sync; no new
+physical checks are implied. PacMan has a separately tested optional ending repair.
 The latest [native hardware follow-up](xbox-native-hardware-followup.md) covers
 normal-main Catch gameplay, recovery and the still-open startup investigation.
 Older sections describe their then-current builds, including historical lwmem

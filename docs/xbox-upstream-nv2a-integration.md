@@ -397,3 +397,36 @@ Hardware follow-up: verify the native backend and the intended saved renderer ch
 on the Xbox, repeat launcher/game/replay/exit and reset tests, check audio and
 texture/pen behavior, and continue every open gate in the
 [21-game qualification matrix](xbox-game-qualification.md).
+
+## Current main launch regression — October 30
+
+Following the upstream sync in PR 46, the normal dual-backend main executable
+`eb3492c2b7149a14200d02486a5d12b95cf886ebdb26655c255ac5f738a24535`
+passes all 21 normal browser → actual archive → pause → Exit cycles with native
+renderer/window 3/0 in one 128 MB snapshot xemu guest. Every return has zero game
+sprites, an empty project path, the exact 21-game list and 42 browser buttons.
+Loaded screenshots were reviewed; some show title screens or automatic endings.
+This is loading/cleanup coverage, not full gameplay, audio, FPS or 64 MB acceptance.
+Mario is allowed to advance past its intro before pause; early-intro input is
+not newly qualified.
+
+All 41 manifest archive/profile source files and the shared base HDD remain
+byte-identical. The XBE has no renderer/input/game tracing or frame/thread
+profiling. GDB selects the native backend at initialization; game state and RNG
+are not changed. The guest closes after acknowledged quit.
+
+The existing primary ISO was stale because its build cache had disc packaging
+disabled. That first boot is excluded. A fresh disc was built from the frozen
+current XBE, and the complete embedded `default.xbe` was read back and matched
+before these checks. See the [build note](xbox-fork-build.md#checking-the-disc-image-used-for-testing).
+
+The separately tested [optional PacMan ending repair](xbox-pacman.md#optional-final-high-score-repair--october-30-2026)
+does not alter the original PacMan used in this 21-game batch. Its six diagnostic
+ending probes and three normal full-project loads are recorded separately.
+
+The IP-KVM observation script reports no physical Xbox HDMI signal during this
+batch; dashboard FTP is unavailable. No hardware input, upload or acceptance is
+claimed. The all-21-game physical goal remains incomplete. Private evidence:
+`build-xbox/native-qualification-20261030/normal-all21-review.json`,
+`all21-loaded-contact-sheet.jpg`, `current-disc-receipt.json` and
+`final-review.json`.
