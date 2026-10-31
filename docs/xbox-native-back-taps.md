@@ -53,3 +53,31 @@ Ignored receipts, original captures and read-only hook logs are under
 `fix/review.json`. Both guests close, and the saved shared HDD and normal Mario
 archive remain unchanged. The fix is not installed on the Xbox. Physical taps,
 controller handoff, audio, pacing and retail 64 MB qualification remain open.
+
+## Pause before the next game frame — October 31, 2026
+
+A fresh normal-main `a66ca892…` run isolates a second source of delay. During
+Mario's intro, a single 12-video-frame Back press followed by 12 released frames
+is received and retained. Pause appears after another 120 neutral video frames,
+without a second press. The earlier color-regression cycle checked too soon;
+its apparent misses do not establish another input-loss bug.
+
+Xbox now checks reserved Back immediately after reading input, before running
+more scripts or rendering the next game frame. It also rearms the Back edge
+when a pause-menu action finishes after release, so a new tap can pause again.
+The existing native input latch, gameplay controls and reset chord are unchanged.
+This is an Xbox-specific runtime change; other platforms keep their existing
+pause handling.
+
+The matching normal candidate `ad481593…` opens pause by the end of the same
+press/release sequence, with no additional neutral-frame wait. Three Back
+resume/reopen cycles, a neutral pause and held-A Exit also pass in the native
+emulator. No gameplay state is written; only renderer selection is overridden
+before startup. These are bounded emulator observations, not physical latency,
+FPS or complete-gameplay measurements. Work already blocking an input poll can
+still delay pause, and a stuck game thread still needs external recovery.
+
+Private evidence: `build-xbox/mario-back-single-tap-20261031/review.json` for the
+baseline and `build-xbox/pause-priority-20261031/native/` for the candidate,
+matching XBE/ELF/ISO receipts, input snapshots and original captures.
+This candidate has not been deployed to the physical Xbox.

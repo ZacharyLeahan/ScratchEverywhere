@@ -31,7 +31,9 @@ not a new physical or complete-gameplay pass.
 
 The October 31 [color-boundary correction](xbox-color-self-alpha.md) passes
 58-case native/SDL regressions, 21 eventual browser returns and a full maze/replay.
-Mario's intro misses two short Back taps; a two-second hold reaches pause.
+The initial Mario pause observation was too short: a later single-tap test
+confirms delivery during the intro, followed by delayed pause. See the
+[Back timing investigation](xbox-native-back-taps.md#pause-before-the-next-game-frame--october-31-2026).
 Extended gameplay results below retain the builds identified in their notes;
 this common cycle does not repeat every full-game objective.
 

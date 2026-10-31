@@ -44,10 +44,11 @@ The direct-load diagnostic harness is separate from normal browser gameplay.
 Its attempted controller returns did not reach the browser and are excluded
 from gameplay evidence; normal browser checks use a separate fresh boot.
 A separate cold-browser guest loads all 21 archives and returns to the exact
-21-game/42-button list with zero game sprites after each exit. Mario misses two
-short Back presses during its intro; a 120-video-frame (about two-second) hold
-opens pause and permits Exit. That input-timing limitation remains open, and
-those failed attempts are retained.
+21-game/42-button list with zero game sprites after each exit. The initial
+Mario pause observations were too short. A later cold single-tap test confirms
+Back delivery during the intro and eventual pause after another 120 neutral
+video frames, without another press. The earlier attempts remain recorded;
+they do not establish lost taps. See the [timing follow-up](xbox-native-back-taps.md#pause-before-the-next-game-frame--october-31-2026).
 
 A normal controller maze run also passes wall blocking, the complete visible
 win, 7,200 further neutral video frames, Green Flag replay and renewed movement,
