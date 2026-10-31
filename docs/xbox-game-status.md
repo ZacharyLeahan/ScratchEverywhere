@@ -120,7 +120,8 @@ and continuity checks remain open where the table says audio.
 
 ## Changes available in main
 
-- [SDL Back-tap repair](xbox-sdl-back-taps.md): continuous Xbox USB reads and
+- [PR 55](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/55),
+  [SDL Back-tap repair](xbox-sdl-back-taps.md): continuous Xbox USB reads and
   one-shot console-menu requests; live gameplay/confirmation remains unchanged.
   SDL menu/replay/reset and virtual hotplug checks pass; hardware is pending.
 

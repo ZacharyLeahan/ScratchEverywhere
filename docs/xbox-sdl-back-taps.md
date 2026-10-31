@@ -49,6 +49,10 @@ profiles are unchanged.
   image, then movement and another clean Exit work. A short reset hold cancels;
   a full chord reaches actual `XReboot` after 123 video frames and fresh `main`.
 
+A separate cold native NV2A smoke test on the same XBE also accepts a short
+Mario Back tap and returns cleanly to the browser. It does not repeat every
+native gameplay objective.
+
 These are emulator/controller regressions, not
 physical gameplay, FPS/audio, 64 MB or hard-freeze recovery acceptance. Work
 already blocking the game thread can still delay the visible menu.
