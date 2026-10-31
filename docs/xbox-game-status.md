@@ -46,7 +46,7 @@ not a new physical or complete-gameplay pass.
 | Asteroids ([checklist](xbox-game-qualification.md)) | Thrust/turn/fire; Score 9,200; Game Over/replay/relaunch | Launch cycle | Further level progression; audio |
 | [Sokoban](xbox-sokoban.md) | Puzzles 1–3; repaired puzzle 10 complete; restart/relaunch | Optional full-set copy: all 13 puzzles, 2,728 moves / 628 pushes, natural wrap; SDL renderer | Full-set copy not installed on hardware; physical full set and native gameplay/audio |
 | [2048](xbox-2048.md) | Natural 2048 win / Score 20,264; continue, loss/replay and repeated exits | Launch cycle | KVM missed/duplicate input and held-confirmation handoff; no authored playback |
-| [Retro Racing](xbox-retro-racing.md) | 108 MPH, braking/steering/off-road slowdown; pause/replay | Launch cycle; clone cleanup checked separately | Full lap, traffic/drift and audio |
+| [Retro Racing](xbox-retro-racing.md) | 108 MPH, braking/steering/off-road slowdown; pause/replay | Current native full lap 02:02.00, Y pause, deliberate drift/smoke, off-road slowdown, replay and two clean returns | Hardware full lap/drift/traffic visuals; audio. Traffic collision is not authored |
 | [Hill Climb Racing](xbox-hill-climb.md) | Jeep 1,000; motorcycle 420; fuel pickup, airtime/crash, vehicle swap/replay | Launch cycle | Extended terrain; precise brake/air control; audio |
 | [Mario](xbox-mario.md) | Four opening pipes; Goomba/pit death and automatic recovery; replay/relaunch | Launch cycle; native Back-tap fix accepts short intro presses | Complete level; physical native Back behavior; subjective audio |
 | Doodle Jump ([checklist](xbox-game-qualification.md)) | At least 1,044 m; both edge wraps; fall/replay/relaunch | Launch cycle | Monsters, longer play and audio |
