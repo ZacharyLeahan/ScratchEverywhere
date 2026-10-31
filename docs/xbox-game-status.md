@@ -29,6 +29,12 @@ After the October 30 upstream sync, normal main build `eb3492c2…` repeats all
 [same limited check](xbox-upstream-nv2a-integration.md#current-main-launch-regression--october-30),
 not a new physical or complete-gameplay pass.
 
+The October 31 [color-boundary correction](xbox-color-self-alpha.md) passes
+58-case native/SDL regressions, 21 eventual browser returns and a full maze/replay.
+Mario's intro misses two short Back taps; a two-second hold reaches pause.
+Extended gameplay results below retain the builds identified in their notes;
+this common cycle does not repeat every full-game objective.
+
 | Game / detailed notes | Real Xbox result | Extended emulator result | Open gameplay / quality checks |
 | --- | --- | --- | --- |
 | [Spider Adventure](xbox-spider-adventure.md) | Level 6; Score 7,516; death, replay and relaunch | All 10 levels / 100 spiders; Score 14,110; victory replay | Full hardware victory; longer audio/listening |
@@ -50,7 +56,7 @@ not a new physical or complete-gameplay pass.
 | [Hill Climb Racing](xbox-hill-climb.md) | Jeep 1,000; motorcycle 420; fuel pickup, airtime/crash, vehicle swap/replay | Launch cycle | Extended terrain; precise brake/air control; audio |
 | [Mario](xbox-mario.md) | Four opening pipes; Goomba/pit death and automatic recovery; replay/relaunch | Current native full level without deaths; flagpole/fireworks/fade, natural replay, Green Flag and two clean returns; short intro Back taps | Hardware full level/native Back behavior; subjective audio and performance |
 | Doodle Jump ([checklist](xbox-game-qualification.md)) | At least 1,044 m; both edge wraps; fall/replay/relaunch | Launch cycle | Monsters, longer play and audio |
-| [Jumper](xbox-jumper.md) | Levels 1–4; lava death, restart/replay; readiness-guard exits | Current native installed prepared copy clears courses 1–19; final-stage ledges/underpass; natural deaths/respawns | Final-stage win/replay; later hardware levels; historical second-Exit handoff needs repeat; audio |
+| [Jumper](xbox-jumper.md) | Levels 1–4; lava death, restart/replay; readiness-guard exits | Native baseline `eb3492c2…` clears courses 1–19; final-stage ledges/underpass; natural deaths/respawns | Final-stage win/replay; later hardware levels; historical second-Exit handoff needs repeat; audio |
 | Connect Four ([checklist](xbox-game-qualification.md)) | Both players; horizontal/vertical/diagonal wins; full-column rejection/replay | Launch cycle | One unexplained initial mouse-mode launch; no authored playback |
 
 ## Performance and audio
@@ -107,6 +113,10 @@ and continuity checks remain open where the table says audio.
   are not bundled with this repository.
 
 ## Changes available in main
+
+- [Xbox color-boundary correction](xbox-color-self-alpha.md): `touching color?`
+  checks the subject's rendered alpha rather than an expanded collision-grid
+  edge. Native/SDL diagnostics and normal-game checks pass; hardware is pending.
 
 - [PR 43](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/43): upstream
   Xbox integration, native graphics/input fixes and Appel controller-menu updates;
