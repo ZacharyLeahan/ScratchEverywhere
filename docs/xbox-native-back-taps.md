@@ -85,9 +85,10 @@ on Green Flag: restart waits for release, restores the exact initial image,
 then movement and another clean Exit work. These are menu regressions, not
 new full-gameplay or audio passes.
 
-SDL has a separate unresolved short-tap limitation: the same intro tap fails
+At this checkpoint SDL still has a short-tap limitation: the same intro tap fails
 on both unchanged `a66ca892…` and the candidate. The native controller latch
-does not cover SDL snapshots. The candidate passes longer Back pause/resume/
+does not cover SDL snapshots. The [SDL USB-read follow-up](xbox-sdl-back-taps.md)
+addresses that separate gap. This pause-priority candidate passes longer Back pause/resume/
 reopen and held-A Exit. Its short reset hold cancels; a full chord reaches
 actual `XReboot` after 124 video frames, then fresh application `main`. This
 confirms responsive-thread emulator behavior, not recovery from a hard hang.
