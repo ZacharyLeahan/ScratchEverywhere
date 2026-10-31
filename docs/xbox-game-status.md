@@ -6,9 +6,10 @@ the [hardware checklist](xbox-game-qualification.md) and linked game notes keep
 the detailed evidence. **The 21-game hardware qualification is incomplete.**
 
 The physical console has **128 MB RAM**. A separate normal build of main now
-passes native NV2A browser selection, Catch Apples ending/replay/steering and one
-clean return to the game list. Native startup reliability and the other twenty
-games still need current-build hardware checks; see the
+passes native NV2A browser selection and gameplay checks for Catch Apples,
+Appel and PacMan, with three clean returns to the game list. Catch also passes
+ending/replay/steering. Native startup reliability and the other eighteen games
+still need current-build hardware checks; see the
 [physical backend follow-up](xbox-native-hardware-followup.md). The installed
 primary dashboard launcher still uses the older SDL Xbox renderer. Merging code
 does not replace it, game archives or saved renderer preferences. Retail 64 MB
@@ -33,14 +34,14 @@ not a new physical or complete-gameplay pass.
 | [Spider Adventure](xbox-spider-adventure.md) | Level 6; Score 7,516; death, replay and relaunch | All 10 levels / 100 spiders; Score 14,110; victory replay | Full hardware victory; longer audio/listening |
 | [Hopper Heros](xbox-hopper.md) | Movement/jump; Score 8; loss/replay and relaunch | Launch cycle | Sustained progression; early short Start sometimes missed; audio |
 | [Ultra Bird](xbox-ultra-bird.md) | Six pipes / Score 6; loss/replay; repeated launch/exit | Launch cycle | Controller delivery; no authored sound |
-| [Catch Apples](xbox-catch-apples.md) | Score 22 / timer expiry; replay; special-apple scores repaired; current main native Score 13 ending, replay, both D-pad directions and one clean Exit | Native timer ending, replay, steering and return | Further repeated native handoff checks; historical Exit → 2048; audio |
+| [Catch Apples](xbox-catch-apples.md) | Score 22 / timer expiry; replay; special-apple scores repaired; current main native Score 14 ending, replay, both D-pad directions and clean Exit | Native timer ending, replay, steering and return | Further repeated native handoff checks; historical Exit → 2048; audio |
 | [Maze Starter](xbox-maze-replay.md) | Complete maze, wall blocking, repeated clean replay | Launch cycle | Shared browser/controller handoff; no authored sound |
 | [Snake](xbox-snake.md) | Score 225 tail-collision ending; blade shrink, clock slowdown/restoration; replay | Launch cycle | Latest second Exit interrupted by adapter disconnects; active audio |
-| [Appel](xbox-appel.md) | Normal play to 21/35 apples, checkpoints/death; earlier diagnostic Level 1 win; TV music reported clean | Normal v4 Level 1 win: 17 apples / 1:07.8; complete authored replay; Try Again | Movement smoothness; normal-v4 physical win/replay; later levels; audio continuity |
+| [Appel](xbox-appel.md) | Normal play to 21/35 apples, checkpoints/death; earlier diagnostic Level 1 win; TV music reported clean; current native menu/terrain/walk/jump to two apples and clean Exit | Normal v4 Level 1 win: 17 apples / 1:07.8; complete authored replay; Try Again | Movement smoothness; normal-v4 physical win/replay; later levels; audio continuity |
 | [Tetris](xbox-tetris.md) | Ten-line/level-up runs; later four-line objective at 1,200; top-out/replay | Independent ordinary four-line run; cap ending checked with seeded diagnostic | Subjective audio; initial capture anomaly; cap is not a natural full playthrough |
 | [Frogger](xbox-frogger.md) | Six pads in one round; all seven positions across rounds; replay/relaunch | All seven in one native round; visible Win, replay and ordinary loss | Hardware seven-pad win/replay; audio. Emulator ending has internal alive=0 despite authored Win |
 | [Breakout](xbox-breakout-controller.md) | Final prepared copy clears board at 1,940; replay and fresh-launch/exit checks | Native board clear at 1,920 / three lives; replay | KVM paddle delivery; faint scaled boundary line; no authored playback |
-| [PacMan](xbox-pacman.md) | Turns/walls/scoring; power pellet +100 and blue ghosts; loss/replay | All 92 collectibles plus one ghost: 1,380; visible Win; Win/loss replay | Hardware full board/ghost; original final High Score gap; optional prepared repair passes ending probes and natural loss/replay, not installed |
+| [PacMan](xbox-pacman.md) | Turns/walls/scoring; power pellet +100 and blue ghosts; loss/replay; current native turn/Score 40 and clean Exit | All 92 collectibles plus one ghost: 1,380; visible Win; Win/loss replay | Hardware full board/ghost; original final High Score gap; optional prepared repair passes ending probes and natural loss/replay, not installed |
 | [Space Invaders](xbox-space-invaders.md) | Score 1,230; shield/life loss, replay/relaunch | Native full wave: 55 → 0 → fresh 55, Score 990 / three lives; wave-two recovery | Hardware full wave; complete audio/listening |
 | Asteroids ([checklist](xbox-game-qualification.md)) | Thrust/turn/fire; Score 9,200; Game Over/replay/relaunch | Launch cycle | Further level progression; audio |
 | [Sokoban](xbox-sokoban.md) | Puzzles 1–3; repaired puzzle 10 complete; restart/relaunch | Optional full-set copy: all 13 puzzles, 2,728 moves / 628 pushes, natural wrap; SDL renderer | Full-set copy not installed on hardware; physical full set and native gameplay/audio |
@@ -62,6 +63,13 @@ remains unmerged. Window-p95 frame times were near 53 ms, with occasional 168–
 in those samples. This is not a whole-level benchmark or native-NV2A measurement.
 There is no measured per-game FPS result for the other twenty games on this page.
 
+A separate current-main [matched backend sample](xbox-appel.md#matched-nativelegacy-hardware-timing--october-30-2026)
+measures **29.50 FPS native / 29.00 FPS legacy**, each over 720 rendered frames
+in the same opening-ground walking plan, with Xbox audio/music and the same
+project/executable. Median window p95 is about 51 ms for both. This single pair
+does not establish a repeatable speed gain or full-level smoothness; the primary
+launcher and saved settings are not promoted from it.
+
 Native-emulator frame budgets and debugger replay durations are not FPS results.
 Source-matched audio samples establish selected cues only. The Appel TV report
 is useful subjective evidence; KVM recordings have lost samples, so their
@@ -71,9 +79,11 @@ and continuity checks remain open where the table says audio.
 ## Shared issues and how to add games
 
 - KVM controller adapters have intermittently gone offline or delivered
-  late/duplicate input. After reconnecting only Player One, the latest native
-  Catch and controller-reset checks completed. The other three adapters remain
-  deliberately disconnected; this is not a four-player retest.
+  late/duplicate input. The latest session uses the documented direct S3 HTTP
+  route: the main KVM firmware has wireless-controller routing disabled.
+  XBMC navigation, three games and reset work on that route. The console log
+  enumerates three controllers; physical port assignment and single-controller
+  isolation are not established, and this is not a four-player retest.
 - Native startup has shown purple in short captures. A longer capture also
   reaches the browser on unchanged main, so neither a permanent freeze nor a
   renderer fix is established by those early images. Repeated, adequately

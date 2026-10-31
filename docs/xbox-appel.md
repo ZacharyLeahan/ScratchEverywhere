@@ -415,3 +415,45 @@ from the physical results above, and adds no FPS, subjective audio or 64 MB
 claim. Physical v4 victory/replay and movement acceptance remain pending. See
 [the scoped native integration result](xbox-upstream-nv2a-integration.md#appel-v4-natural-victory-and-full-replay--october-29)
 and ignored `build-xbox/appel-v4-native-fullrun-20261029/review.json`.
+
+
+## Matched native/legacy hardware timing — October 30, 2026
+
+A separate frame-profile build of current main runs the **same installed v3
+archive** on the physical 128 MB Xbox at 480p. Only the graphics/window backend
+settings change; Xbox audio, music, the executable and the reviewed controller
+plan stay the same. From fresh Level 1, the plan establishes the left boundary,
+settles six seconds, and alternates Right/Left for ten 1.2-second pairs, with
+150 ms neutral gaps. Continuous HDMI recordings show movement, timer progress,
+one apple and a live player in both runs.
+
+| Backend | Measured frames | Rendered FPS | Median window p95 | Largest sampled frame |
+| --- | ---: | ---: | ---: | ---: |
+| Native NV2A graphics/windowing | 720 | 29.50 | 51.28 ms | 57.31 ms |
+| Legacy Xbox graphics / SDL3 windowing | 720 | 29.00 | 51.12 ms | 67.92 ms |
+
+Each result uses six complete 120-frame windows wholly inside the walking
+phase; menu/loading/positioning/settling windows are excluded. FPS is computed
+from their total measured frame periods, not the KVM recording rate. The p95
+column is the median of six window percentiles, not a pooled percentile.
+Periodic diagnostic report-writing time is excluded by the profiler in both
+runs. The original recordings retain 596/594 JPEGs over 45 seconds, and the
+UDP logs have no missing sequence numbers in either session.
+
+**One pair does not establish a repeatable speed gain.** Both backends are near
+30 FPS in this opening-ground route and still show frames over 50 ms. Mean
+script/render work is 17.65/13.39 ms native and 17.48/14.24 ms legacy. These are
+CPU-side accumulated phases, not isolated GPU costs. Longer scrolling/jumping
+routes, later geometry, repeated order-swapped runs and ordinary-build
+smoothness remain open. No performance optimization or settings promotion is
+being claimed from this measurement; the older transform-cache experiment
+remains unmerged.
+
+Profiling XBE SHA-256:
+`b9057e39801dcfe7a2398bfc5c500078ba87d32a55a11eecd31152a0cb76d398`.
+Only frame profiling and UDP diagnostics are enabled; thread/game/menu/renderer
+traces are off. The game remains `117188bad1ec98620d6bd578964d6d796b9e363bd4006851a586e02d709a9863`.
+Private evidence is shared observations `scratch-physical-current-20261031T013014Z`,
+`profile-native-review.json`, `profile-legacy-review.json`, their exact plans,
+UDP logs, recovered disk logs and original gameplay recordings. The normal
+non-profiled build has separate [native gameplay checks](xbox-native-hardware-followup.md#current-main-three-game-hardware-check--october-30).
