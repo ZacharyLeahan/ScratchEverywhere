@@ -103,8 +103,9 @@ and continuity checks remain open where the table says audio.
   It cannot guarantee recovery from a hard hang or disconnected adapter. Native
   Back taps are retained across slow polls. The runtime checks Back before the
   next script/render batch, but work already in progress can still delay it.
-  SDL can miss a short intro tap even on the unchanged baseline; a longer hold
-  works in the emulator. See the [timing checks](xbox-native-back-taps.md).
+  The [SDL USB-read repair](xbox-sdl-back-taps.md) also retains short Back taps
+  across slow frames and passes 21 emulator menu cycles plus virtual USB
+  removal/reconnect. Physical confirmation remains open.
 - The original PacMan can miss its final High Score update. An optional
   [prepared-project repair](xbox-pacman.md#optional-final-high-score-repair--october-30-2026)
   now passes isolated ending probes and normal loss/replay in xemu; the physical
@@ -118,6 +119,10 @@ and continuity checks remain open where the table says audio.
   are not bundled with this repository.
 
 ## Changes available in main
+
+- [SDL Back-tap repair](xbox-sdl-back-taps.md): continuous Xbox USB reads and
+  one-shot console-menu requests; live gameplay/confirmation remains unchanged.
+  SDL menu/replay/reset and virtual hotplug checks pass; hardware is pending.
 
 - [PR 54](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/54): Xbox
   pause before another script/render batch; 21 native menu cycles, gated Green

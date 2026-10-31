@@ -19,6 +19,10 @@ window was too short. See the [timing follow-up](xbox-native-back-taps.md#pause-
 acceptance, and expanded graphics coverage uses an explicit diagnostic override
 documented in that note.
 
+The [SDL Back-tap repair](xbox-sdl-back-taps.md) adds 21 normal SDL emulator
+menu cycles, release-gated Green Flag replay, reset and virtual USB reconnect
+checks. It has not been deployed to the Xbox and adds no physical acceptance.
+
 The goal is all twenty-one installed games thoroughly tested on the physical
 Xbox, with fixes until each works. Downloads, successful builds, and a title
 screen are not full passes.

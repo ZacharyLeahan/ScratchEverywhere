@@ -159,14 +159,14 @@ void InputDevice_SDL3::getInput() {
 #endif
     }
     if (SDL_GetGamepadButton(controller, SDL_GamepadButton::SDL_GAMEPAD_BUTTON_START)) Input::buttonPress("start");
-    if (SDL_GetGamepadButton(controller, SDL_GamepadButton::SDL_GAMEPAD_BUTTON_BACK)) {
 #ifdef __XBOX__
-        // Reserve the physical menu button independently of game mappings.
-        Input::inputButtons.push_back("back");
+    // A down/up pair may be drained before this game poll; consume its reserved
+    // menu request once without retaining gameplay or confirmation buttons.
+    const bool backPressed = WindowSDL3::consumeXboxBackPress();
+    if (backPressed || SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_BACK)) Input::inputButtons.push_back("back");
 #else
-        Input::buttonPress("back");
+    if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_BACK)) Input::buttonPress("back");
 #endif
-    }
     if (SDL_GetGamepadButton(controller, SDL_GamepadButton::SDL_GAMEPAD_BUTTON_LEFT_STICK)) Input::buttonPress("LeftStickPressed");
     if (SDL_GetGamepadButton(controller, SDL_GamepadButton::SDL_GAMEPAD_BUTTON_RIGHT_STICK)) Input::buttonPress("RightStickPressed");
     float joyLeftX = SDL_GetGamepadAxis(controller, SDL_GamepadAxis::SDL_GAMEPAD_AXIS_LEFTX);
