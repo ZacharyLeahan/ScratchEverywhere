@@ -31,7 +31,7 @@ not a new physical or complete-gameplay pass.
 
 The October 31 [color-boundary correction](xbox-color-self-alpha.md) passes
 58-case native/SDL regressions, 21 eventual browser returns and a full maze/replay.
-The initial Mario pause observation was too short: a later single-tap test
+The initial native Mario pause observation was too short: a later single-tap test
 confirms delivery during the intro, followed by delayed pause. See the
 [Back timing investigation](xbox-native-back-taps.md#pause-before-the-next-game-frame--october-31-2026).
 Extended gameplay results below retain the builds identified in their notes;
@@ -101,7 +101,10 @@ and continuity checks remain open where the table says audio.
   requests Xbox reboot while the game loop responds. A three-second test hold
   recovered to XBMC; an earlier hold exactly at the two-second threshold did not.
   It cannot guarantee recovery from a hard hang or disconnected adapter. Native
-  Back taps are retained across slow polls, but a slow render can still delay pause.
+  Back taps are retained across slow polls. The runtime checks Back before the
+  next script/render batch, but work already in progress can still delay it.
+  SDL can miss a short intro tap even on the unchanged baseline; a longer hold
+  works in the emulator. See the [timing checks](xbox-native-back-taps.md).
 - The original PacMan can miss its final High Score update. An optional
   [prepared-project repair](xbox-pacman.md#optional-final-high-score-repair--october-30-2026)
   now passes isolated ending probes and normal loss/replay in xemu; the physical
@@ -115,6 +118,11 @@ and continuity checks remain open where the table says audio.
   are not bundled with this repository.
 
 ## Changes available in main
+
+- [PR 54](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/54): Xbox
+  pause before another script/render batch; 21 native menu cycles, gated Green
+  Flag replay, SDL longer-hold menu controls and reset checks. Physical testing
+  and SDL short-tap retention remain open.
 
 - [Xbox color-boundary correction](xbox-color-self-alpha.md): `touching color?`
   checks the subject's rendered alpha rather than an expanded collision-grid
