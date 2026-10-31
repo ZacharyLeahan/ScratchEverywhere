@@ -128,7 +128,7 @@ and continuity checks remain open where the table says audio.
 - [PR 54](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/54): Xbox
   pause before another script/render batch; 21 native menu cycles, gated Green
   Flag replay, SDL longer-hold menu controls and reset checks. Physical testing
-  and SDL short-tap retention remain open.
+  remains open; the separate SDL tap gap is addressed by PR 55 above.
 
 - [Xbox color-boundary correction](xbox-color-self-alpha.md): `touching color?`
   checks the subject's rendered alpha rather than an expanded collision-grid
