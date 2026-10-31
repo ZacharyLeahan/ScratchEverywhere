@@ -126,3 +126,26 @@ JPEG hashes. After the separate timing follow-up, all 21 archives and 20
 control sidecars match the fresh pre-session backups byte for byte. The exact original settings
 are restored and verified as `adc181b7…`; the primary dashboard launcher is
 preserved. XBMC FTP is available, and all controls/capture/listeners are released.
+
+
+## Dashboard recovery and saved log — October 31
+
+The previous native Maze session's 2,806-byte startup log is now saved, SHA-256
+`372b572bc4e40adc9fe81282ef41aef465ff47cf9741bac490a1789c66e79ccd`.
+It records successful NV2A 640×480/Xbox-audio initialization, the browser, three
+controller identifiers and Maze archive/control loading through precache.
+It contains no explicit crash and does not explain the later signal loss.
+Native Maze replay and Exit remain unverified in that hardware session.
+
+Direct S3 input visibly navigated XBMC settings. Toggling XBMC's enabled FTP
+service off and on restored access long enough to retrieve the log and restore
+the exact original settings, with full readback matching `adc181b7…` above.
+The next launch preflight timed out connecting to FTP, before writing settings
+or requesting RunXBE. HDMI and controller USB then became unavailable while
+still in XBMC, before any new Scratch launch. This dashboard occurrence does
+not establish a Scratch crash or a hardware root cause. The saved preferences
+are restored; there is no pending settings rollback.
+
+Private evidence: shared observations `scratch-reconnected-20261031T1153Z`,
+`retrieval-restoration-receipt.json`, `ftp-before/debug.txt`,
+`Settings-restored-readback.json` and the aborted native-launch receipt.
