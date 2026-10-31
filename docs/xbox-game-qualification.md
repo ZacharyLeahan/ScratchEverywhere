@@ -14,9 +14,10 @@ checks; current upstream removes the Xbox lwmem override. Use the
 
 The [October 31 color-boundary correction](xbox-color-self-alpha.md) has native
 and SDL diagnostic coverage plus normal-emulator browser/maze checks. Mario's
-short intro Back taps still miss; the longer hold succeeds. These add no
-physical acceptance, and expanded graphics coverage uses an explicit diagnostic
-override documented in that note.
+native intro Back request is delivered but can be delayed; the initial observation
+window was too short. See the [timing follow-up](xbox-native-back-taps.md#pause-before-the-next-game-frame--october-31-2026). These add no physical
+acceptance, and expanded graphics coverage uses an explicit diagnostic override
+documented in that note.
 
 The goal is all twenty-one installed games thoroughly tested on the physical
 Xbox, with fixes until each works. Downloads, successful builds, and a title

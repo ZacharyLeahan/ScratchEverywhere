@@ -59,6 +59,9 @@ void Scratch::initializeScratchProject() {
 }
 
 std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayThread) {
+#if defined(ENABLE_MENU) && defined(__XBOX__)
+    static bool backWasHeld = false;
+#endif
 #ifdef SE_XBOX_PROFILE_FRAMES
     Timer profilePoll;
 #endif
@@ -86,6 +89,11 @@ std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayTh
         if (pauseMenu->shouldUnpause) {
             MenuManager::cleanup();
             pauseMenu = nullptr;
+#ifdef __XBOX__
+            // Menu actions finish after Back is released; rearm immediately so
+            // a new tap can pause again before the next scheduled game poll.
+            backWasHeld = false;
+#endif
         }
         return std::make_pair(Render::appShouldRun(), false);
     }
@@ -141,6 +149,19 @@ std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayTh
 #endif
         if (checkFPS) {
             Input::getInput();
+#if defined(ENABLE_MENU) && defined(__XBOX__)
+            // Honor the console-menu request before another script/render batch
+            // can block on lazy costume loading. The native input device keeps
+            // short Back taps latched until this poll consumes them.
+            const bool backHeld = std::find(Input::inputButtons.begin(), Input::inputButtons.end(), "back") != Input::inputButtons.end();
+            const bool pauseRequested = backHeld && !backWasHeld;
+            backWasHeld = backHeld;
+            if (pauseRequested) {
+                pauseMenu = new PauseMenu();
+                MenuManager::changeMenu(pauseMenu);
+                return std::make_pair(true, false);
+            }
+#endif
             BlockExecutor::executeWhenGreaterThanHats();
         }
 #ifdef SE_XBOX_PROFILE_FRAMES
@@ -202,18 +223,9 @@ std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayTh
             extensions::runUpdateFunctions(extensions::POST_RENDER);
 #endif
         }
-#ifdef ENABLE_MENU
-
+#if defined(ENABLE_MENU) && !defined(__XBOX__)
         const bool browserProject = projectType == ProjectType::UNEMBEDDED || (projectType == ProjectType::UNZIPPED && Unzip::UnpackedInSD);
-#ifdef __XBOX__
-        // Back/Select opens the console menu; Start remains available to games.
-        static bool backWasHeld = false;
-        const bool backHeld = std::find(Input::inputButtons.begin(), Input::inputButtons.end(), "back") != Input::inputButtons.end();
-        const bool pauseRequested = backHeld && !backWasHeld;
-        backWasHeld = backHeld;
-#else
         const bool pauseRequested = browserProject && Input::keyHeldDuration["1"] > 90 * (FPS / 30.0f);
-#endif
         if (pauseRequested) {
             pauseMenu = new PauseMenu();
             MenuManager::changeMenu(pauseMenu);
